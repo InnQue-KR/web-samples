@@ -328,9 +328,10 @@ try {
     check(`유효(${tagC}): 글꼴 파일 외 네트워크 요청 0건, 주소에 쿼리 없음`, sent.length === 0 && page.url() === `${BASE}quote/`, `글꼴 ${requests.length - before - sent.length}건 / 그 외 ${sent.map((r) => `${r.method} ${r.url}`).join(',')}`);
     check(`유효(${tagC}): 저장소·쿠키 비어 있음, 콘솔·HTML에 입력값 없음`, (await storageEmpty(page)) && !consoleMsgs.some((m) => Object.values(T).some((v) => m.includes(v))) && !Object.values(T).some((v) => html.includes(v)));
     if (contact === T.phone) {
+      // 완료 안내가 보이는 상태(초점이 안내 상자로 가며 화면에 들어옴)를 먼저 찍는다
+      await page.screenshot({ path: `${OUT}quote-done-1280.png` });
       await page.fill('#f-company', 'x');
       check('다시 입력하면 안내 상자 숨김', !(await page.evaluate(() => document.getElementById('formResult').classList.contains('is-visible'))));
-      await page.screenshot({ path: `${OUT}quote-done-1280.png` });
     }
     await context.close();
   }
