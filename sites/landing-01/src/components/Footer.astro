@@ -1,0 +1,17 @@
+---
+import site from '../data/site.json';
+const base = import.meta.env.BASE_URL;
+const b = site.business;
+---
+<footer data-component="Footer" class="site-footer on-dark">
+  <div class="container">
+    <a class="site-footer__logo" href="#top" aria-label={`${b.logoText} 처음으로`}><img src={`${base}images/logo-light.svg`} alt={b.logoText} width="128" height="44" /></a>
+    <div class="site-footer__info">
+      <p>{b.name} | 학원 등록번호 {b.registrationNo} | 교습과목 {b.subject}</p>
+      <p>{b.address}</p>
+      <p><span class="nowrap">전화 {b.phone}</span> | <span class="nowrap">{b.email}</span></p>
+    </div>
+    <div class="site-footer__links"><button type="button" class="link-btn" data-sample-notice="privacy">개인정보처리방침</button></div>
+    <p class="site-footer__notice">{site.notice.footer}</p>
+  </div>
+</footer>

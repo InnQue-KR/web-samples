@@ -1,0 +1,22 @@
+{
+  "name": "@web-samples/sample-kit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "모든 샘플이 반드시 지켜야 하는 것만 모은 최소 공통 틀: noindex head, 샘플 띠, 연결 대신 안내, 미전송 샘플 폼 잠금, Pretendard 공식 파일 복사. 색·글꼴 크기·배치 같은 브랜드는 넣지 않는다.",
+  "type": "module",
+  "exports": {
+    "./SampleHead.astro": "./SampleHead.astro",
+    "./SampleStrip.astro": "./SampleStrip.astro",
+    "./sample-notice": "./sample-notice.ts",
+    "./sample-form": "./sample-form.ts"
+  },
+  "bin": {
+    "copy-pretendard": "./scripts/copy-pretendard.mjs"
+  },
+  "peerDependencies": {
+    "astro": "7.4.12"
+  },
+  "dependencies": {
+    "pretendard": "1.3.9"
+  }
+}

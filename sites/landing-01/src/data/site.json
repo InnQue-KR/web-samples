@@ -1,0 +1,54 @@
+{
+  "sampleId": "landing-01",
+  "notice": {
+    "topStrip": "샘플 사이트 · 실제 업체가 아닙니다",
+    "footer": "이 사이트는 InnQue가 포트폴리오용으로 만든 자체 제작 샘플이며 실제 업체가 아닙니다. 상호, 주소, 연락처, 인물, 가격은 모두 가상입니다. 기획·문구·이미지 제작에 AI를 활용했고 사람이 검토했습니다.",
+    "formSubmit": "샘플 사이트라 실제로 전송되지 않습니다. 실제 납품에서는 이 단계에서 담당자에게 접수 알림이 갑니다.",
+    "phone": "샘플 사이트입니다. 실제 사이트에서는 이 버튼이 전화 연결로 이어집니다.",
+    "privacy": "샘플 사이트입니다. 실제 사이트에서는 개인정보처리방침 페이지로 연결됩니다."
+  },
+  "business": {
+    "name": "셈틈 수학학원",
+    "logoText": "셈틈 수학",
+    "registrationNo": "제0000-00호(가상)",
+    "subject": "중등 수학",
+    "phone": "000-0000-0000",
+    "email": "hello@example.com",
+    "address": "샘플시 견본구 예시로 12, 3층 (가상 주소)",
+    "businessNo": "000-00-00000"
+  },
+  "nav": [
+    { "label": "수업 방식", "href": "#method" },
+    { "label": "반 안내", "href": "#classes" },
+    { "label": "선생님", "href": "#teachers" },
+    { "label": "상담 순서", "href": "#process" },
+    { "label": "자주 묻는 질문", "href": "#faq" },
+    { "label": "오시는 길", "href": "#location" }
+  ],
+  "hours": [
+    { "days": "평일", "time": "오후 2시~10시" },
+    { "days": "토요일", "time": "오전 10시~오후 4시" },
+    { "days": "일요일·공휴일", "time": "휴무" }
+  ],
+  "seo": {
+    "title": "셈틈 수학학원 | 중학생 수학 소수반",
+    "description": "한 반 8명까지, 수업마다 막힌 곳을 확인하는 중학생 수학학원. 겨울방학 특강 상담 신청.",
+    "siteName": "셈틈 수학학원 (샘플)",
+    "themeColor": "#FAF8F3",
+    "ogImage": "images/og-image.png",
+    "ogImageWidth": 1200,
+    "ogImageHeight": 630,
+    "ogImageAlt": "셈틈 수학 로고와 제목 '막힌 곳을 찾아서, 틈부터 채웁니다'"
+  },
+  "track": [
+    { "event": "cta_hero_apply", "where": "첫 화면 [겨울방학 상담 신청하기]" },
+    { "event": "cta_sticky_apply", "where": "휴대폰 하단 고정 [상담 신청] (768px 미만)" },
+    { "event": "cta_phone", "where": "머리말 전화 아이콘, 오시는 길 [전화하기]" }
+  ],
+  "classes": [
+    { "name": "중1 개념반", "schedule": "주 2회, 회당 2시간", "fee": "24만 원" },
+    { "name": "중2 내신반", "schedule": "주 3회, 회당 2시간", "fee": "32만 원" },
+    { "name": "중3 고등 준비반", "schedule": "주 3회, 회당 2시간 30분", "fee": "36만 원" },
+    { "name": "중학 수학 총정리 4주", "tag": "겨울방학 특강", "schedule": "주 4회, 회당 2시간", "fee": "4주 30만 원" }
+  ]
+}

@@ -1,0 +1,52 @@
+---
+import Icon from './Icon.astro';
+import site from '../data/site.json';
+---
+<section data-component="Location" id="location" class="section" aria-labelledby="location-title">
+  <div class="container">
+    <div class="section__head reveal"><h2 class="section__title" id="location-title">오시는 길·운영 시간</h2></div>
+    <div class="location__grid">
+      <figure class="map reveal">
+        <svg viewBox="0 0 640 420" role="img" aria-labelledby="map-title" xmlns="http://www.w3.org/2000/svg">
+          <title id="map-title">셈틈 수학학원 약도 일러스트. 큰길 모퉁이 건물 3층이며 버스 정류장에서 걸어서 갈 수 있다. 모든 표시는 가상이다.</title>
+          <rect width="640" height="420" fill="#F3EFE5" />
+          <g fill="#E9E2D0">
+            <rect x="20" y="20" width="200" height="130" rx="10" /><rect x="250" y="20" width="150" height="130" rx="10" /><rect x="430" y="20" width="190" height="130" rx="10" />
+            <rect x="20" y="230" width="200" height="170" rx="10" /><rect x="430" y="230" width="190" height="170" rx="10" />
+          </g>
+          <rect x="0" y="168" width="640" height="46" fill="#FFFFFF" />
+          <path d="M0 191H640" stroke="#C9BFA6" stroke-width="2" stroke-dasharray="14 12" />
+          <rect x="226" y="0" width="18" height="420" fill="#FFFFFF" />
+          <rect x="406" y="0" width="18" height="420" fill="#FFFFFF" />
+          <rect x="262" y="236" width="130" height="150" rx="8" fill="#1B2A4A" />
+          <g fill="#FAF8F3"><rect x="278" y="254" width="28" height="22" rx="3" /><rect x="348" y="254" width="28" height="22" rx="3" /><rect x="278" y="296" width="28" height="22" rx="3" /><rect x="348" y="296" width="28" height="22" rx="3" /></g>
+          <rect x="318" y="346" width="20" height="40" rx="3" fill="#FAF8F3" />
+          <rect x="278" y="296" width="28" height="22" rx="3" fill="#FFE066" />
+          <g transform="translate(327 214)">
+            <rect x="-112" y="-64" width="224" height="46" rx="8" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="2" />
+            <text x="0" y="-30" text-anchor="middle" font-size="26" font-weight="800" fill="#1B2A4A">셈틈 수학 · 3층</text>
+            <path d="M-8 -20L0 -8L8 -20Z" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="2" stroke-linejoin="round" />
+            <rect x="-9" y="-21" width="18" height="4" fill="#FFFFFF" />
+          </g>
+          <g>
+            <rect x="70" y="122" width="140" height="40" rx="6" fill="#FFFFFF" stroke="#1B2A4A" stroke-width="2" />
+            <text x="140" y="150" text-anchor="middle" font-size="22" font-weight="700" fill="#1B2A4A">버스 정류장</text>
+          </g>
+          <path d="M150 222C160 256 210 296 258 304" fill="none" stroke="#1B2A4A" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" />
+          <text x="40" y="270" font-size="22" font-weight="600" fill="#44506B">도보 약 3분</text>
+          <text x="40" y="298" font-size="22" font-weight="500" fill="#5B667E">(가상)</text>
+          <text x="446" y="94" font-size="22" font-weight="600" fill="#5B667E">초등학교 (가상)</text>
+          <text x="446" y="326" font-size="22" font-weight="600" fill="#5B667E">편의점 (가상)</text>
+        </svg>
+        <figcaption class="map__caption">위치를 알려 드리기 위한 약도 일러스트입니다. 실제 지도가 아니며 모든 표시는 가상입니다.</figcaption>
+      </figure>
+      <div class="info-list reveal" style="--reveal-delay: 80ms">
+        <div class="info-list__row"><Icon name="map-pin" /><div><p class="info-list__label">주소</p><p class="info-list__value">{site.business.address}</p></div></div>
+        <div class="info-list__row"><Icon name="clock" /><div><p class="info-list__label">운영 시간</p>
+          <div class="hours info-list__value">{site.hours.map((h) => <Fragment><span>{h.days}</span><span>{h.time}</span></Fragment>)}</div></div></div>
+        <div class="info-list__row"><Icon name="phone" /><div><p class="info-list__label">전화</p><p class="info-list__value">{site.business.phone}</p></div></div>
+        <div><button type="button" class="btn btn--secondary btn--small" data-sample-notice="phone" data-track="cta_phone"><Icon name="phone" /> 전화하기</button></div>
+      </div>
+    </div>
+  </div>
+</section>

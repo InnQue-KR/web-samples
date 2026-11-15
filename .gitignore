@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+out/
+qa-output/
+sites/*/public/fonts/pretendard/
+.env
+.env.*
+!.env.example
+.DS_Store

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" role="img" aria-label="강사 얼굴 없는 상반신 일러스트 (중2 내신반)">
+  <title>강사 얼굴 없는 상반신 일러스트 (중2 내신반)</title>
+  <rect width="240" height="240" fill="#F1EBDC"/>
+  <path d="M30 240c0-46 36-74 90-74s90 28 90 74z" fill="#7C8CAE"/>
+  <path d="M96 168l24 34 24-34" fill="#FAF8F3"/>
+  <path d="M120 168v72M96 176l-4 64M144 176l4 64" stroke="#5F6F94" stroke-width="3" fill="none"/>
+  <rect x="106" y="132" width="28" height="40" rx="10" fill="#E2C7A4"/>
+  <ellipse cx="120" cy="104" rx="38" ry="44" fill="#EAD2B4"/>
+  <path d="M76 108c-6-44 14-66 46-66s52 22 44 66c-2 14 2 34 8 44-14 0-26-4-28-12-2-26-6-44-8-52-18 4-34 2-48-6-6 14-8 38-12 58-10 2-20-2-24-8 8-8 18-24 22-44z" fill="#5A4636"/>
+</svg>

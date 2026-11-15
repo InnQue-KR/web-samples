@@ -1,0 +1,29 @@
+---
+import site from '../data/site.json';
+const base = import.meta.env.BASE_URL;
+---
+<section data-component="Classes" id="classes" class="section" aria-labelledby="classes-title">
+  <div class="container">
+    <div class="classes__art reveal"><img src={`${base}images/classroom.svg`} alt="" width="960" height="240" /></div>
+    <div class="section__head reveal"><h2 class="section__title" id="classes-title">학년별 반 안내</h2></div>
+    <div class="fee-table-wrap reveal">
+      <table class="fee-table">
+        <caption class="sr-only">반별 수업 시간과 월 교습비 (가상 금액)</caption>
+        <thead><tr><th scope="col">반</th><th scope="col">수업</th><th scope="col">월 교습비</th></tr></thead>
+        <tbody>
+          {site.classes.map((c) => (
+            <tr class:list={[{ 'is-special': 'tag' in c }]}>
+              <th scope="row" class="cell-name">{'tag' in c && <Fragment><span class="tag">{c.tag}</span><br /></Fragment>}{c.name}</th>
+              <td class="cell-time">{c.schedule}</td>
+              <td class="cell-fee">{c.fee}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="fee-notes reveal">
+      <p>교재비는 별도입니다(반별 1만~2만 원). 교습비는 교육청에 등록한 금액입니다.</p>
+      <p>위 금액은 모두 가상입니다.</p>
+    </div>
+  </div>
+</section>

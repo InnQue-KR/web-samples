@@ -1,0 +1,84 @@
+---
+/**
+ * 샘플 상담 신청 폼. 입력 5개(성함·연락처·학년·시간·궁금한 점), 첨부 없음.
+ * 입력값은 전송·저장하지 않는다. 잠금 방식은 @web-samples/sample-kit/sample-form 주석 참고.
+ * - 개인정보 칸(성함·연락처·궁금한 점)과 동의 체크에는 name 속성을 두지 않는다.
+ * - 모든 입력과 제출 버튼은 <fieldset data-sample-lock disabled> 안에 있다. 스크립트가 붙어야 풀린다.
+ */
+import site from '../data/site.json';
+const grades = ['예비 중1', '중1', '중2', '중3'];
+const times = ['평일 오후', '평일 저녁', '토요일'];
+---
+<div class="form-card reveal" style="--reveal-delay: 80ms" data-component="ApplyForm">
+  <form id="apply-form" novalidate>
+    <p class="form-js-off" id="form-js-off" data-sample-js-off>이 샘플 폼은 브라우저의 자바스크립트가 켜져 있어야 입력할 수 있습니다. 어떤 경우에도 입력값은 전송되지 않습니다. 전화 상담 안내는 위 [오시는 길]을 봐 주세요.</p>
+    <fieldset class="form-lock" data-sample-lock disabled>
+      <legend class="sr-only">상담 신청 입력</legend>
+      <div class="form-summary" id="form-summary" role="alert" tabindex="-1"></div>
+
+      <div class="field" data-field="name">
+        <label class="field__label" for="f-name">학부모 성함 <span class="field__badge">선택</span></label>
+        <input class="input" id="f-name" type="text" autocomplete="name" maxlength="30" aria-describedby="f-name-hint f-name-err" />
+        <p class="field__hint" id="f-name-hint">성함을 남기시려면 아래 [선택] 동의에 체크해 주세요. 비워 두셔도 신청할 수 있습니다.</p>
+        <label class="check">
+          <input type="checkbox" id="f-name-consent" />
+          <span>[선택] 이름의 수집·이용에 동의합니다.</span>
+        </label>
+        <p class="field__error" id="f-name-err"></p>
+      </div>
+
+      <div class="field" data-field="phone">
+        <label class="field__label" for="f-phone">연락처 <span class="field__badge field__badge--req">필수</span></label>
+        <input class="input" id="f-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="숫자만 입력해도 됩니다" maxlength="20" required aria-required="true" aria-describedby="f-phone-err" />
+        <p class="field__error" id="f-phone-err"></p>
+      </div>
+
+      <fieldset class="field">
+        <legend class="field__label">학생 학년 <span class="field__badge">선택</span></legend>
+        <div class="chips">
+          {grades.map((g) => <label class="chip"><input type="radio" name="grade" value={g} /><span>{g}</span></label>)}
+        </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend class="field__label">상담 받기 편한 시간 <span class="field__badge">선택</span></legend>
+        <div class="chips">
+          {times.map((t) => <label class="chip"><input type="radio" name="time" value={t} /><span>{t}</span></label>)}
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label class="field__label" for="f-question">궁금한 점 <span class="field__badge">선택</span></label>
+        <textarea class="textarea" id="f-question" maxlength="500" placeholder="아이의 현재 어려움이나 궁금한 점을 적어 주세요."></textarea>
+      </div>
+
+      <div class="consent" data-field="consent">
+        <label class="check">
+          <input type="checkbox" id="f-consent" required aria-required="true" aria-describedby="f-consent-err" />
+          <span><strong>[필수]</strong> 문의 처리를 위한 개인정보 수집·이용에 동의합니다. (샘플: 실제로 수집하지 않음)</span>
+        </label>
+        <details class="consent__box">
+          <summary>수집·이용 내용 펼쳐 보기</summary>
+          <div class="consent__body">
+            <p><strong>이 폼은 샘플 시연입니다</strong><br />
+            입력하신 연락처·성함·학년·상담 희망 시간·궁금한 점은 지금 보고 계신 브라우저 화면 안에서 입력 형식을 확인하는 데만 쓰입니다. 서버·외부 서비스로 보내지 않고, 쿠키·브라우저 저장소·주소창에도 남기지 않습니다. 확인을 마치거나 [처음부터 다시 해 보기]를 누르면 화면의 입력값을 지웁니다. 동의를 거부할 수 있으며, 거부하면 이 시연의 확인 단계로 넘어가지 않습니다. 실제 상담은 이 샘플로 받지 않습니다.</p>
+            <p><strong>[필수] 실제 납품 사이트에서 이 자리에 들어가는 내용</strong><br />
+            수집·이용 주체(학원 상호), 목적(상담 신청 확인 및 전화 안내), 항목(연락처, 입력한 경우 학년·희망 시간·궁금한 점), 보유·이용 기간, 동의 거부 권리와 거부 시 다른 상담 방법, 문의 및 권리 행사 연락처를 실제 정보로 채웁니다. 외부 폼 서비스를 쓰면 국외 이전 고지와 동의를 따로 둡니다.</p>
+            <p><strong>[선택] 이름 수집·이용 동의</strong><br />
+            목적: 상담 담당자 식별. 항목: 이름. 동의하지 않아도 신청할 수 있습니다. 이 샘플에서는 이름도 저장·전송하지 않습니다.</p>
+          </div>
+        </details>
+        <p class="field__error" id="f-consent-err"></p>
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--block">상담 신청 보내기</button>
+    </fieldset>
+  </form>
+
+  <div class="form-done" id="form-done" role="status" aria-live="polite" tabindex="-1">
+    <h3 class="form-done__title">입력 확인을 마쳤습니다 (샘플)</h3>
+    <p class="section__lead">입력하신 값은 보내거나 저장하지 않았고, 화면에서도 지웠습니다.</p>
+    <p class="form-done__notice">{site.notice.formSubmit}</p>
+    <button type="button" class="btn btn--secondary" id="form-reset">처음부터 다시 해 보기</button>
+  </div>
+</div>

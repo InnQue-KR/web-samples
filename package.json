@@ -1,0 +1,26 @@
+{
+  "name": "web-samples",
+  "private": true,
+  "description": "InnQue 포트폴리오용 가상 샘플 사이트 모음. 각 샘플은 독립 Astro 앱이며 /<sample-id>/ 하위 경로로 빌드한다.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "packageManager": "npm@11.19.1",
+  "engines": {
+    "node": ">=24.22.3 <25",
+    "npm": ">=11"
+  },
+  "workspaces": [
+    "packages/*",
+    "sites/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present && node scripts/assemble.mjs",
+    "check": "npm run check --workspaces --if-present && node scripts/check-dist.mjs",
+    "smoke": "node tests/smoke-landing-01.mjs",
+    "preview": "node scripts/serve-dist.mjs",
+    "zip": "python3 scripts/make_zips.py"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}

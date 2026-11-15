@@ -1,0 +1,33 @@
+---
+import Icon from './Icon.astro';
+---
+<section data-component="Method" id="method" class="section section--alt" aria-labelledby="method-title">
+  <div class="container">
+    <div class="section__head reveal"><h2 class="section__title" id="method-title">셈틈 수업은 이렇게 합니다</h2></div>
+    <ul class="method__list">
+      <li class="card reveal">
+        <div class="card__icon"><Icon name="users" /></div>
+        <h3 class="card__title">한 반 8명까지.</h3>
+        <p class="card__text">선생님이 수업 시간 안에 모든 학생의 풀이를 직접 봅니다.</p>
+      </li>
+      <li class="card card--notebook reveal" style="--reveal-delay: 80ms">
+        <div class="card__icon"><Icon name="notebook-pen" /></div>
+        <h3 class="card__title">매 수업 <span class="mark">'틈 노트'</span>.</h3>
+        <p class="card__text">틀린 문제를 유형이 아니라 "어느 단계에서 막혔는지"로 적습니다. 다음 수업은 그 단계에서 시작합니다.</p>
+        <div class="gap-note" role="group" aria-label="틈 노트 예시">
+          <span class="gap-note__label">틈 노트 예시 (가상)</span>
+          <dl>
+            <dt>문제</dt><dd>일차방정식 7번</dd>
+            <dt>막힌 단계</dt><dd>이항할 때 부호</dd>
+            <dt>다음 수업</dt><dd>이항 단계부터 다시</dd>
+          </dl>
+        </div>
+      </li>
+      <li class="card reveal" style="--reveal-delay: 160ms">
+        <div class="card__icon"><Icon name="message-square-text" /></div>
+        <h3 class="card__title">한 달에 한 번 학부모 안내.</h3>
+        <p class="card__text">이번 달 진도, 막혔던 단원, 다음 달 계획을 정리해 보내 드립니다.</p>
+      </li>
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,26 @@
+---
+const base = import.meta.env.BASE_URL;
+const teachers = [
+  { img: 'teacher-1.svg', alt: '원장 (얼굴 없는 일러스트)', role: '원장', cls: '중3 고등 준비반 담당', career: '수학교육 전공, 중등 수학 지도 12년' },
+  { img: 'teacher-2.svg', alt: '강사 (얼굴 없는 일러스트)', role: '강사', cls: '중2 내신반 담당', career: '수학 전공, 중등 수학 지도 6년' },
+  { img: 'teacher-3.svg', alt: '강사 (얼굴 없는 일러스트)', role: '강사', cls: '중1 개념반 담당', career: '수학교육 전공, 중등 수학 지도 4년' },
+];
+---
+<section data-component="Teachers" id="teachers" class="section section--alt" aria-labelledby="teachers-title">
+  <div class="container">
+    <div class="section__head reveal"><h2 class="section__title" id="teachers-title">가르치는 사람들</h2></div>
+    <ul class="teachers__list">
+      {teachers.map((t, i) => (
+        <li class="card teacher reveal" style={i ? `--reveal-delay: ${i * 80}ms` : undefined}>
+          <div class="teacher__pic"><img src={`${base}images/${t.img}`} alt={t.alt} width="240" height="240" loading="lazy" /></div>
+          <div>
+            <h3 class="teacher__role">{t.role}</h3>
+            <p class="teacher__class">{t.cls}</p>
+            <p class="teacher__career">{t.career}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+    <p class="teachers__note">인물 그림은 실제 강사가 아닌 얼굴 없는 일러스트입니다.</p>
+  </div>
+</section>

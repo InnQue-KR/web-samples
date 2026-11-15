@@ -1,0 +1,19 @@
+---
+import Icon from './Icon.astro';
+const faqs = [
+  { q: '학기 중간에도 들어갈 수 있나요?', a: '네. 진단 테스트로 지금 진도에 맞는 반을 찾습니다.' },
+  { q: '진단 테스트 결과가 나쁘면 등록이 안 되나요?', a: '아닙니다. 반을 정하기 위한 테스트입니다.' },
+  { q: '결석하면 어떻게 하나요?', a: '같은 주 다른 반 수업이나 보강 시간에 들을 수 있습니다.' },
+  { q: '교재는 무엇을 쓰나요?', a: '반별로 시중 교재 1권과 학원 자체 학습지를 씁니다.' },
+];
+---
+<section data-component="Faq" id="faq" class="section section--alt" aria-labelledby="faq-title">
+  <div class="container faq__grid">
+    <div class="section__head reveal"><h2 class="section__title" id="faq-title">자주 묻는 질문</h2></div>
+    <div class="faq__list">
+      {faqs.map((f) => (
+        <details class="faq-item reveal"><summary>{f.q}<span class="icon-slot"><Icon name="chevron-down" /></span></summary><p class="faq-item__body">{f.a}</p></details>
+      ))}
+    </div>
+  </div>
+</section>

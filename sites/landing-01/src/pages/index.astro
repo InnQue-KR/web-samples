@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Method from '../components/Method.astro';
+import Classes from '../components/Classes.astro';
+import Teachers from '../components/Teachers.astro';
+import Process from '../components/Process.astro';
+import Faq from '../components/Faq.astro';
+import Location from '../components/Location.astro';
+import Apply from '../components/Apply.astro';
+import Footer from '../components/Footer.astro';
+import StickyCta from '../components/StickyCta.astro';
+---
+<BaseLayout>
+  <Header />
+  <main id="main">
+    <Hero />
+    <Method />
+    <Classes />
+    <Teachers />
+    <Process />
+    <Faq />
+    <Location />
+    <Apply />
+  </main>
+  <Footer />
+  <StickyCta />
+  <script>
+    import '../scripts/landing';
+  </script>
+</BaseLayout>

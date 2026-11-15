@@ -1,0 +1,19 @@
+---
+import Icon from './Icon.astro';
+import site from '../data/site.json';
+const base = import.meta.env.BASE_URL;
+---
+<header data-component="Header" class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__logo" href="#top" aria-label={`${site.business.logoText} 처음으로`}><img src={`${base}images/logo.svg`} alt={site.business.logoText} width="128" height="44" /></a>
+    <nav class="site-nav" aria-label="구역 이동">
+      <ul>
+        {site.nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+    <div class="site-header__actions">
+      <button type="button" class="icon-btn" data-sample-notice="phone" data-track="cta_phone" aria-label={`전화하기 ${site.business.phone}`}><Icon name="phone" /></button>
+      <a class="btn btn--primary btn--small site-header__apply" href="#apply">상담 신청</a>
+    </div>
+  </div>
+</header>
