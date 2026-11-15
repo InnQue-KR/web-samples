@@ -1,0 +1,61 @@
+---
+/**
+ * 공통 틀 4종(Home / Page / NewsList / NewsDetail)의 바깥 껍데기.
+ * 머리(noindex·OG) → 본문 건너뛰기 → 샘플 띠 → 머리말 → <main> → (견적 띠) → 바닥글 → 샘플 안내창.
+ */
+import SampleHead from '@web-samples/sample-kit/SampleHead.astro';
+import SampleStrip from '@web-samples/sample-kit/SampleStrip.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import CtaBand from '../components/CtaBand.astro';
+import SampleNotice from '../components/SampleNotice.astro';
+import site from '../data/site.json';
+import { url } from '../lib/url';
+import '../styles/tokens.css';
+import '../styles/site.css';
+
+export type Frame = 'Home' | 'Page' | 'NewsList' | 'NewsDetail';
+interface Props {
+  frame: Frame;
+  /** 메뉴 현재 위치 판단용 경로(base 제외). 예: 'about/' */
+  current: string;
+  title?: string;
+  description?: string;
+  /** 하단 견적 띠. 개인정보처리방침·404는 false */
+  cta?: boolean;
+}
+const { frame, current, title = site.seo.title, description = site.seo.description, cta = true } = Astro.props;
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <SampleHead
+      title={title}
+      description={description}
+      siteName={site.seo.siteName}
+      themeColor={site.seo.themeColor}
+      favicon="images/favicon.svg"
+      ogImage={site.seo.ogImage}
+      ogImageWidth={site.seo.ogImageWidth}
+      ogImageHeight={site.seo.ogImageHeight}
+      ogImageAlt={site.seo.ogImageAlt}
+    >
+      <link rel="stylesheet" href={url('fonts/pretendard/pretendardvariable-dynamic-subset.css')} />
+      <link rel="stylesheet" href={url('fonts/plex-mono/plex-mono.css')} />
+    </SampleHead>
+  </head>
+  <body data-frame={frame}>
+    <a class="skip-link" href="#main">본문으로 바로가기</a>
+    <SampleStrip class="sample-strip" text={site.notice.topStrip} />
+    <SiteHeader current={current} />
+    <main id="main" tabindex="-1">
+      <slot />
+      {cta && <CtaBand />}
+    </main>
+    <SiteFooter />
+    <SampleNotice />
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>

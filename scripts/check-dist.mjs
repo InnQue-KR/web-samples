@@ -3,6 +3,7 @@
 //  - 내부 경로(/, ./, url())가 실제 파일로 풀림, 샘플 페이지의 경로는 /<id>/ 아래
 //  - 번들 JS: 네트워크 전송·브라우저 저장소·쿠키·콘솔 코드 없음
 //  - landing-01: data-track 정확히 3종, 폼 잠금(fieldset disabled)과 개인정보 칸 name 없음
+//  - company-01: 확정 URL 10개+404, URL별 title/description/OG, 견적 폼 잠금·name 없음·입력 5개 이하·첨부 없음·동의 2개, data-track 미연결
 //  - Pretendard dynamic-subset 범위 밖 글자(글꼴 누락) 목록, 페이지별 예상 전송량
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -83,6 +84,41 @@ if (existsSync(landing)) {
   report.formFields = [...new Set(inputs)];
   if (report.formFields.length > 5) fail(`landing-01: 입력 항목 ${report.formFields.length}개 (5개 이하)`);
   if (/type="file"/.test(html)) fail('landing-01: 첨부 입력 있음');
+}
+
+// 2-1) company-01 전용 확인: 확정 URL 10개 + 404, 견적 폼 잠금·입력 5개·첨부 없음, 측정 이벤트 미연결
+const company = join(dist, 'company-01');
+if (existsSync(company)) {
+  const pages = ['', 'about/', 'services/', 'cases/', 'news/', 'news/seollal-holiday/', 'news/5-axis-machining-center/', 'news/quality-certification-renewal/', 'quote/', 'privacy/'];
+  const builtPages = files.filter((f) => f.endsWith('/index.html') && sampleOf(f) === 'company-01').map((f) => rel(f).replace(/^\/company-01\//, '').replace(/index\.html$/, '')).sort();
+  if (JSON.stringify(builtPages) !== JSON.stringify([...pages].sort())) fail(`company-01: 콘텐츠 URL ${builtPages.length}개 [${builtPages.join(', ')}] (기대 10개)`);
+  if (!existsSync(join(company, '404.html'))) fail('company-01: 404.html 없음');
+  report.companyUrls = pages.map((p) => `/company-01/${p}`);
+  const titles = new Set();
+  for (const p of pages) {
+    const html = readFileSync(join(company, p, 'index.html'), 'utf8');
+    const t = html.match(/<title>([^<]+)<\/title>/)?.[1];
+    if (!t || titles.has(t)) fail(`company-01/${p}: title 없음 또는 중복`);
+    titles.add(t);
+    if (!/<meta name="description" content="[^"]+"/.test(html)) fail(`company-01/${p}: description 없음`);
+    if (!/<meta property="og:title"/.test(html) || !/<meta property="og:image" content="\/company-01\//.test(html)) fail(`company-01/${p}: OG 없음`);
+    if (/data-sample-notice="[^"]*상세/.test(html)) fail(`company-01/${p}: 상세 대신 안내창으로 남은 공지 링크`);
+  }
+  const quote = readFileSync(join(company, 'quote/index.html'), 'utf8');
+  if (!/<fieldset[^>]*data-sample-lock[^>]*disabled/.test(quote)) fail('company-01: 견적 폼 fieldset 기본 잠금(disabled) 없음');
+  const formHtml = quote.match(/<form[^>]*id="quoteForm"[\s\S]*?<\/form>/)?.[0] ?? '';
+  if (/\sname=/.test(formHtml.replace(/<form[^>]*>/, ''))) fail('company-01: 견적 폼 안에 name 속성 있음(제출 시 값이 붙을 수 있음)');
+  if (/\saction=/.test(formHtml.match(/<form[^>]*>/)?.[0] ?? '')) fail('company-01: 견적 폼에 action 있음');
+  const fields = (formHtml.match(/<(input|textarea|select)\b(?![^>]*type="checkbox")[^>]*>/g) ?? []).map((t) => t.match(/id="([^"]+)"/)?.[1]);
+  report.companyFormFields = fields;
+  if (fields.length > 5) fail(`company-01: 입력 항목 ${fields.length}개 (5개 이하)`);
+  if (/type="file"/.test(formHtml)) fail('company-01: 첨부 입력 있음');
+  const consents = formHtml.match(/type="checkbox"/g)?.length ?? 0;
+  if (consents !== 2) fail(`company-01: 동의 체크 ${consents}개 (필수·선택 2개)`);
+  for (const f of files.filter((x) => x.endsWith('.js') && x.startsWith(company))) {
+    const js = readFileSync(f, 'utf8');
+    if (/data-track|dataset\.track|\[data-track/.test(js)) fail(`${rel(f)}: data-track 이벤트 연결 코드 있음(기업 DELUXE 범위 밖)`);
+  }
 }
 
 // 3) 글꼴 범위·전송량 (샘플별)

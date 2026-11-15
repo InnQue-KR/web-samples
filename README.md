@@ -5,6 +5,7 @@ InnQue 포트폴리오용 **가상** 샘플 사이트 모음입니다. 모든 �
 | sample-id | 내용 | 경로 |
 |---|---|---|
 | `landing-01` | 셈틈 수학학원(가상) 랜딩 PREMIUM | `sites/landing-01/` → `dist/landing-01/` |
+| `company-01` | 도람정밀(가상) 기업 홈페이지 DELUXE, 콘텐츠 URL 10개 + 404 | `sites/company-01/` → `dist/company-01/` ([목록](sites/company-01/README.md)) |
 
 ## 고정 버전
 
@@ -15,6 +16,7 @@ InnQue 포트폴리오용 **가상** 샘플 사이트 모음입니다. 모든 �
 | Astro | 7.4.12 | 2026-11-15 npm 최신 안정판, exact 고정 |
 | TypeScript / @astrojs/check | 6.0.3 / 0.9.12 | @astrojs/check가 TS 7을 아직 지원하지 않아 6.x |
 | Pretendard | 1.3.9 | 공식 npm 패키지의 가변 dynamic-subset을 변경 없이 복사 |
+| IBM Plex Mono (company-01) | 1.1.0 | 공식 Latin1 woff2 2개를 변경 없이 저장소에 둠(npm 패키지는 설치 때 원격 측정을 실행해 의존성으로 넣지 않음) |
 | Playwright(검사용) | 1.65.1 | Chromium headless shell |
 
 의존성은 루트 `package-lock.json` 하나로 고정합니다(npm workspaces: `packages/*`, `sites/*`).
@@ -24,10 +26,12 @@ InnQue 포트폴리오용 **가상** 샘플 사이트 모음입니다. 모든 �
 ```bash
 npm ci                 # lockfile 그대로 설치
 npm run build          # 각 사이트 빌드(+ Pretendard 복사) → dist/<sample-id>/ 로 조립, dist/index.html·404.html·.nojekyll 생성
-npm run check          # astro check(타입) + dist 정적 검사(noindex·샘플 띠·외부 주소·경로·폼 잠금·data-track·글꼴 범위·전송량)
+npm run check          # astro check(타입) + dist 정적 검사(noindex·샘플 띠·외부 주소·경로·폼 잠금·data-track·글꼴 범위·전송량, company-01 URL 10개·OG)
 npx playwright install chromium   # smoke 처음 한 번
-npm run smoke          # 브라우저 smoke(72+개 항목) → qa-output/landing-01/smoke.json, PNG
-npm run preview        # http://127.0.0.1:4321/landing-01/ (dist를 GitHub Pages처럼 제공)
+npm run smoke          # 두 사이트 브라우저 smoke → qa-output/<sample-id>/smoke.json, PNG
+npm run smoke:landing-01   # 랜딩만(73개 항목)
+npm run smoke:company-01   # 기업만(114개 항목)
+npm run preview        # http://127.0.0.1:4321/landing-01/ · /company-01/ (dist를 GitHub Pages처럼 제공, 없는 경로는 루트 404)
 npm run zip            # out/ 에 소스 ZIP·배포 ZIP과 SHA-256
 ```
 
@@ -51,7 +55,7 @@ tests/                   smoke-<sample-id>.mjs
 
 공통 틀에는 **실제로 반복되는 것만** 둡니다: noindex head, 샘플 띠, 연결 대신 안내, 미전송 폼 잠금, 글꼴 복사. 회사 브랜드(숯색·도면 격자 등)나 색·간격 값은 공통 기본 테마로 만들지 않습니다. 토큰은 각 사이트 `src/styles/tokens.css`에 같은 이름 체계(`--color-*`, `--text-*`, `--space-*`, `--radius-*`)로 둡니다.
 
-## 새 샘플 추가(예: company-01)
+## 새 샘플 추가(company-01을 이 순서로 추가함)
 
 1. `sites/company-01/` 앱 생성, `astro.config.mjs`의 `base: '/company-01/'`, `@web-samples/sample-kit` 의존.
 2. 루트에서 `npm install`로 lockfile 갱신(루트 버전·스크립트는 그대로).

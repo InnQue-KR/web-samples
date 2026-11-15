@@ -1,0 +1,64 @@
+{
+  "_note": "모든 값은 가상입니다. 실제 납품에서는 고객 정보로 교체합니다. 경로(href)는 base(/company-01/)를 뺀 값입니다.",
+  "business": {
+    "name": "도람정밀",
+    "nameEn": "DORAM",
+    "legalName": "도람정밀 (가상)",
+    "representative": "대표 (가상 인물)",
+    "businessNo": "000-00-00000",
+    "address": "샘플시 견본구 산업로 12 (가상 주소)",
+    "tel": "000-0000-0000",
+    "email": "hello@example.com",
+    "hours": "평일 오전 8시 30분~오후 5시 30분",
+    "closed": "토·일요일, 공휴일 휴무",
+    "established": 2009,
+    "employees": 18,
+    "factoryArea": "1,650㎡",
+    "quoteSla": "영업일 2일"
+  },
+  "nav": [
+    { "label": "회사 소개", "href": "about/", "children": [
+      { "label": "회사 소개", "href": "about/" },
+      { "label": "연혁·인증", "href": "about/#history" }
+    ] },
+    { "label": "가공 서비스", "href": "services/", "children": [
+      { "label": "가공 서비스", "href": "services/" },
+      { "label": "가공 사례", "href": "cases/" },
+      { "label": "설비", "href": "services/#equipment" },
+      { "label": "품질 관리", "href": "services/#quality" }
+    ] },
+    { "label": "소식", "href": "news/" },
+    { "label": "오시는 길", "href": "about/#access" },
+    { "label": "견적 문의", "href": "quote/", "cta": true }
+  ],
+  "footerNav": [
+    { "label": "회사 소개", "href": "about/" },
+    { "label": "연혁·인증", "href": "about/#history" },
+    { "label": "가공 서비스", "href": "services/" },
+    { "label": "가공 사례", "href": "cases/" },
+    { "label": "설비", "href": "services/#equipment" },
+    { "label": "품질 관리", "href": "services/#quality" },
+    { "label": "소식", "href": "news/" },
+    { "label": "견적 문의", "href": "quote/" },
+    { "label": "오시는 길", "href": "about/#access" },
+    { "label": "개인정보처리방침", "href": "privacy/" }
+  ],
+  "notice": {
+    "topStrip": "샘플 사이트 · 실제 업체가 아닙니다",
+    "footer": "이 사이트는 InnQue가 포트폴리오용으로 만든 자체 제작 샘플이며 실제 업체가 아닙니다. 상호, 주소, 연락처, 인물, 가격은 모두 가상입니다. 기획·문구·이미지 제작에 AI를 활용했고 사람이 검토했습니다.",
+    "copy": "© DORAM (가상 브랜드 · InnQue 제작 샘플)",
+    "external": "샘플 사이트입니다. 전화·외부 연결은 동작하지 않습니다.",
+    "formTitle": "샘플 사이트라 실제로 전송되지 않습니다.",
+    "formBody": "실제 납품에서는 이 단계에서 담당자에게 접수 알림이 갑니다."
+  },
+  "seo": {
+    "siteName": "DORAM 도람정밀 (샘플)",
+    "title": "정밀가공 · 지그·픽스처 · 시제품 | DORAM 도람정밀 (샘플)",
+    "description": "자동화 설비 부품과 지그·픽스처를 CNC로 가공합니다. 시제품 1개부터 반복 생산까지 상담합니다. (샘플 사이트)",
+    "themeColor": "#12284A",
+    "ogImage": "images/og-image.png",
+    "ogImageWidth": 1200,
+    "ogImageHeight": 630,
+    "ogImageAlt": "DORAM 도람정밀(가상) 샘플 사이트 대표 이미지: 로고와 CNC 가공 장면 일러스트"
+  }
+}

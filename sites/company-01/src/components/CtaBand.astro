@@ -1,0 +1,10 @@
+---
+import Icon from './Icon.astro';
+import { url } from '../lib/url';
+---
+<section class="cta-band" data-component="CtaBand" aria-labelledby="cta-band-title">
+  <div class="container">
+    <div><h2 id="cta-band-title">도면을 보내 주시면 영업일 2일 안에 견적을 드립니다.</h2><p>도면은 접수 확인 연락 뒤 이메일로 받습니다. 먼저 품목과 수량을 알려 주세요.</p></div>
+    <a class="btn btn--signal btn--lg" href={url('quote/')} data-track="cta_quote_click">견적 문의하기<Icon name="arrow-right" /></a>
+  </div>
+</section>

@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHead from '../components/PageHead.astro';
+import LocalNav from '../components/LocalNav.astro';
+import CaseList from '../components/CaseList.astro';
+import { serviceNav } from '../lib/nav';
+---
+<BaseLayout frame="Page" current="cases/" title="가공 사례 | DORAM 도람정밀 (샘플)" description="도람정밀의 가공 사례 9건. 소재·공정·용도 필터. (샘플 사이트, 가상 사례)">
+  <PageHead crumbs={[{ label: '가공 서비스', href: 'services/' }, { label: '가공 사례' }]} title="가공 사례" lead="소재·공정·용도로 골라 볼 수 있습니다. 실제 거래처 이름은 싣지 않습니다." />
+  <LocalNav current="cases/" items={serviceNav} />
+  <CaseList />
+</BaseLayout>

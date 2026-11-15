@@ -1,0 +1,36 @@
+---
+/** ④ NewsDetail. 글마다 한 URL. 다음 글 = 더 최근 글, 이전 글 = 더 오래된 글(시안 순서). */
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/PageHead.astro';
+import { getNews, newsPath, ymd, type News } from '../../lib/news';
+import { url, img } from '../../lib/url';
+import site from '../../data/site.json';
+
+export async function getStaticPaths() {
+  const list = await getNews();
+  return list.map((entry, i) => ({ params: { slug: entry.id }, props: { entry, newer: list[i - 1], older: list[i + 1] } }));
+}
+interface Props { entry: News; newer?: News; older?: News }
+const { entry, newer, older } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+<BaseLayout frame="NewsDetail" current={newsPath(entry)} title={`${d.title} | DORAM 도람정밀 (샘플)`} description={d.description}>
+  <PageHead crumbs={[{ label: '소식', href: 'news/' }, { label: '글 보기' }]} />
+  <section class="section" data-component="NewsArticle"><div class="container"><article class="article">
+    <span class="tag">{d.tag}</span>
+    <h1 style="margin-top:12px">{d.title}</h1>
+    <div class="article__meta"><time class="num" datetime={ymd(d.date)}>{ymd(d.date)}</time><span>{site.business.legalName}</span></div>
+    <div class="article__body">
+      {d.image && <img src={img(d.image)} alt={d.imageAlt ?? ''} width="1200" height="800" />}
+      {d.image && <p class="ai-note" style="margin-top:-12px">연출용 일러스트이며 실제 사진이 아닙니다.</p>}
+      <Content />
+    </div>
+    <nav class="article__nav" aria-label="이전·다음 글">
+      {newer ? <a href={url(newsPath(newer))}><span class="k">다음 글</span><span class="t">{newer.data.title}</span></a> : <p class="is-empty"><span class="k">다음 글</span><span>다음 글이 없습니다.</span></p>}
+      {older ? <a href={url(newsPath(older))}><span class="k">이전 글</span><span class="t">{older.data.title}</span></a> : <p class="is-empty"><span class="k">이전 글</span><span>이전 글이 없습니다.</span></p>}
+    </nav>
+    <div class="article__back"><a class="btn btn--outline" href={url('news/')}>목록으로</a></div>
+  </article></div></section>
+</BaseLayout>

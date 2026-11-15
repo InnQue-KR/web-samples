@@ -1,0 +1,7 @@
+---
+/** 안내 상자(왼쪽 주황 선 + 아이콘). */
+import Icon from './Icon.astro';
+interface Props { icon: 'info' | 'file-text' | 'map-pin'; class?: string; style?: string; reveal?: boolean }
+const { icon, class: extra, style, reveal = true } = Astro.props;
+---
+<div class:list={['notice', extra]} style={style} data-reveal={reveal ? '' : undefined}><Icon name={icon} /><slot /></div>

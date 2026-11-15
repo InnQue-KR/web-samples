@@ -1,0 +1,16 @@
+---
+/** 구역 머리(eyebrow + 제목 [+ 오른쪽 '전체 보기' 링크]). level로 h2/h3를 고른다(통합 페이지 안에서는 h3). */
+import Icon from './Icon.astro';
+import { url } from '../lib/url';
+interface Props { eyebrow: string; title: string; level?: 2 | 3; link?: { label: string; href: string }; id?: string }
+const { eyebrow, title, level = 2, link, id } = Astro.props;
+const H = level === 2 ? 'h2' : 'h3';
+---
+{link ? (
+  <div class="sec-head sec-head--row" data-reveal>
+    <div><span class="eyebrow">{eyebrow}</span><H class="h2" id={id} style="margin-top:12px">{title}</H></div>
+    <a class="link-arrow" href={url(link.href)}>{link.label}<Icon name="arrow-right" /></a>
+  </div>
+) : (
+  <div class="sec-head" data-reveal><span class="eyebrow">{eyebrow}</span><H class="h2" id={id}>{title}</H><slot /></div>
+)}

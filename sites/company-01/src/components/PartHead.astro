@@ -1,0 +1,15 @@
+---
+/**
+ * 통합 페이지의 구역 머리. 시안에서 따로 있던 페이지(연혁·인증, 오시는 길, 설비, 품질 관리)의 PageHead 모양을 유지하되
+ * 페이지 제목(h1)은 하나만 두기 위해 h2로 쓴다. id는 메뉴 앵커(#history 등)다.
+ */
+interface Props { id: string; eyebrow: string; title: string; lead?: string }
+const { id, eyebrow, title, lead } = Astro.props;
+---
+<section class="part-head" id={id} aria-labelledby={`${id}-title`} data-component="PartHead">
+  <div class="container">
+    <span class="eyebrow">{eyebrow}</span>
+    <h2 id={`${id}-title`}>{title}</h2>
+    {lead && <p class="lead">{lead}</p>}
+  </div>
+</section>

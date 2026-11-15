@@ -1,0 +1,19 @@
+---
+import Icon from './Icon.astro';
+import { url, img } from '../lib/url';
+---
+<section class="hero" data-component="Hero"><div class="container"><div class="grid">
+  <div class="hero__copy">
+    <span class="eyebrow">CNC Precision Machining</span>
+    <h1>도면 한 장에서 양산까지, 공차를 지키는 정밀가공</h1>
+    <p class="lead">자동화 설비 부품과 지그·픽스처를 CNC로 가공합니다. 시제품 1개부터 반복 생산까지 상담합니다.</p>
+    <div class="hero__actions">
+      <a class="btn btn--signal btn--lg" href={url('quote/')} data-track="hero_quote_click">견적 문의하기<Icon name="arrow-right" /></a>
+      <a class="btn btn--outline btn--lg" href={url('cases/')} data-track="hero_cases_click">가공 사례 보기</a>
+    </div>
+  </div>
+  <figure class="hero__media">
+    <img src={img('hero.svg')} alt="CNC 밀링 공구가 금속 부품을 절삭하며 절삭유가 흐르는 장면의 일러스트" width="1600" height="900" fetchpriority="high" />
+    <figcaption class="media-note">일러스트 · 실제 사진이 아닙니다</figcaption>
+  </figure>
+</div></div></section>

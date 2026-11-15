@@ -1,0 +1,125 @@
+---
+/**
+ * 가공 서비스(② Page). 시안의 services.html + equipment.html(#equipment) + quality.html(#quality)을 한 URL로 조립.
+ * 가공 사례는 별도 URL(cases/). 원래 페이지 제목은 구역 머리(PartHead, h2)로 옮겼다.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHead from '../components/PageHead.astro';
+import LocalNav from '../components/LocalNav.astro';
+import PartHead from '../components/PartHead.astro';
+import Icon from '../components/Icon.astro';
+import Notice from '../components/Notice.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import { serviceNav } from '../lib/nav';
+import { img } from '../lib/url';
+
+const services = [
+  { id: 's01', no: 'SERVICE 01', image: 'field-1.svg', alt: '정밀 부품 가공 일러스트', title: '정밀 부품 가공', lead: '알루미늄, 스테인리스, 엔지니어링 플라스틱 부품을 도면 공차에 맞춰 가공합니다.',
+    points: ['3축·5축 머시닝, CNC 선반으로 형상에 맞는 설비를 고릅니다', '도면 공차를 확인하고 가공이 어려운 형상은 견적 때 먼저 말씀드립니다', '반복 주문은 기록해 둔 가공 조건으로 같은 부품을 만듭니다'] },
+  { id: 's02', no: 'SERVICE 02', image: 'field-2.svg', alt: '지그·픽스처 일러스트', title: '지그·픽스처', lead: '조립·검사 공정에 쓰는 고정구를 설계 검토부터 함께 만듭니다.',
+    points: ['부품 형상과 작업 순서에 맞는 고정 방식을 함께 검토합니다', '검사 지그, 조립 지그, 위치결정 핀 홀더 등을 가공합니다', '기존 지그의 개선·복제 가공도 도면을 보고 상담합니다'] },
+  { id: 's03', no: 'SERVICE 03', image: 'field-3.svg', alt: '시제품 일러스트', title: '시제품·소량 생산', lead: '1개부터 받습니다. 양산 전 형상 확인용 시제품을 빠르게 만듭니다.',
+    points: ['시제품 1개부터 소량 생산까지 수량에 맞춰 상담합니다', '형상 확인 뒤 수정 도면을 반영해 다시 가공합니다', '양산 전환 때 가공 조건을 그대로 이어 갑니다'] },
+];
+const materials = [
+  ['알루미늄', '6061, 7075', '베이스 플레이트, 브래킷, 방열 블록', '밀링·5축'],
+  ['스테인리스', '303, 304', '샤프트, 클램프 블록', '선반·밀링'],
+  ['탄소강', '—', '플랜지, 핀 홀더', '선반·밀링'],
+  ['엔지니어링 플라스틱', 'POM, MC나일론', '부시, 기어 플레이트', '선반·밀링'],
+];
+const equipment = [
+  ['5축 머시닝센터', '2 대', '동시 5축 가공, 복잡한 곡면·다면 부품', 'Ø500 × H300 mm'],
+  ['3축 머시닝센터', '6 대', '평면·포켓·구멍 가공', '600×400×300 mm'],
+  ['CNC 선반', '4 대', '축·부시·플랜지 등 회전 부품', 'Ø200 × L300 mm'],
+  ['3차원 측정기', '1 대', '첫 부품 전수 측정, 출하 검사', '500×500×400 mm'],
+];
+const inspection = [
+  ['3차원 측정기', '복잡한 형상과 위치 공차 측정', '② 첫 부품 · ④ 최종'],
+  ['캘리퍼스·마이크로미터', '길이·지름·두께 측정', '③ 공정 중'],
+  ['높이 게이지', '단차·높이 측정', '② ③'],
+  ['핀 게이지', '구멍 지름 확인', '③ ④'],
+];
+---
+<BaseLayout
+  frame="Page"
+  current="services/"
+  title="가공 서비스 · 설비 · 품질 관리 | DORAM 도람정밀 (샘플)"
+  description="정밀 부품 가공, 지그·픽스처, 시제품·소량 생산과 가공 가능 소재·크기 표, 설비 목록, 검사 순서와 검사 장비. (샘플 사이트, 가상 수치)"
+>
+  <PageHead crumbs={[{ label: '가공 서비스' }]} title="가공 서비스" lead="정밀 부품, 지그·픽스처, 시제품·소량 생산을 한 곳에서 상담합니다." />
+  <LocalNav current="services/" items={serviceNav} />
+
+  <section class="section" data-component="ServiceBlocks"><div class="container">
+    {services.map((s, i) => (
+      <div class:list={['split', { 'split--rev': i === 1 }]} id={s.id} style={`margin-bottom:${i < services.length - 1 ? 'var(--sp-9)' : '0'}`} data-reveal data-component="ServiceBlock">
+        <figure class="split__media"><img src={img(s.image)} alt={s.alt} width="800" height="600" loading="lazy" /></figure>
+        <div class="split__text">
+          <span class="field-card__no">{s.no}</span><h2 class="h2">{s.title}</h2><p class="lead">{s.lead}</p>
+          <ul class="checks">{s.points.map((p) => <li><span class="checks__icon"><Icon name="check" /></span><span>{p}</span></li>)}</ul>
+        </div>
+      </div>
+    ))}
+  </div></section>
+
+  <section class="section section--gray" data-component="SpecTable" id="materials"><div class="container">
+    <div class="sec-head" data-reveal><span class="eyebrow">Materials &amp; Size</span><h2 class="h2">가공 가능 소재와 크기</h2><p class="muted">아래 값은 가상의 기준입니다. 정확한 가공 가능 여부는 도면을 보고 알려 드립니다.</p></div>
+    <div class="table-wrap" data-reveal><table class="spec-table"><caption>가공 가능 소재</caption>
+      <thead><tr><th scope="col">소재</th><th scope="col">규격</th><th scope="col">가공 예</th><th scope="col">주 공정</th></tr></thead>
+      <tbody>{materials.map(([m, g, ex, pr]) => <tr><th scope="row">{m}</th><td data-label="규격">{g}</td><td data-label="가공 예">{ex}</td><td data-label="주 공정">{pr}</td></tr>)}</tbody>
+    </table></div>
+    <div class="table-wrap" style="margin-top:var(--sp-6)" data-reveal><table class="spec-table"><caption>크기와 공차</caption>
+      <thead><tr><th scope="col">항목</th><th scope="col">기준</th><th scope="col">설명</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">최대 가공 크기</th><td class="num" data-label="기준">600×400×300 mm</td><td data-label="설명">3축 머시닝센터 기준</td></tr>
+        <tr><th scope="row">일반 공차</th><td class="num" data-label="기준">±0.02 mm</td><td data-label="설명">도면에 별도 지정이 없는 경우의 기준</td></tr>
+        <tr><th scope="row">최소 수량</th><td class="num" data-label="기준">1 개</td><td data-label="설명">시제품 1개부터 접수</td></tr>
+        <tr><th scope="row">견적 회신</th><td class="num signal" data-label="기준">영업일 2일</td><td data-label="설명">도면을 확인한 뒤 견적서를 보내 드립니다</td></tr>
+      </tbody>
+    </table></div>
+    <Notice icon="info" style="margin-top:var(--sp-6)"><p>정확한 가공 가능 여부는 도면을 보고 알려 드립니다. 표에 없는 소재나 큰 크기도 먼저 문의해 주세요.</p></Notice>
+  </div></section>
+
+  <PartHead id="equipment" eyebrow="Equipment" title="설비" lead="5축·3축 머시닝센터, CNC 선반, 3차원 측정기를 갖추고 있습니다. 설비 수치는 모두 가상입니다." />
+  <section class="section" data-component="EquipmentPhotos"><div class="container">
+    <div class="photo-trio" data-reveal>
+      <figure><img src={img('equip-1.svg')} alt="공장 안에 나란히 놓인 머시닝센터 두 대의 일러스트" width="1200" height="800" loading="lazy" /><figcaption>3축 머시닝센터 라인(일러스트)</figcaption></figure>
+      <figure><img src={img('equip-2.svg')} alt="머시닝센터 세 대가 한 줄로 놓인 공장 내부 일러스트" width="1200" height="800" loading="lazy" /><figcaption>가공 구역(일러스트)</figcaption></figure>
+      <figure><img src={img('equip-3.svg')} alt="대형 머시닝센터와 옆의 조작 단말 일러스트" width="1200" height="800" loading="lazy" /><figcaption>5축 머시닝센터(일러스트)</figcaption></figure>
+    </div>
+    <p class="ai-note">설비 이미지는 장비 제조사 표시가 없는 연출용 일러스트이며 실제 설비 사진이 아닙니다.</p>
+  </div></section>
+  <section class="section section--gray" data-component="SpecTable"><div class="container">
+    <div class="sec-head" data-reveal><span class="eyebrow">Equipment list</span><h3 class="h2">설비 목록</h3></div>
+    <div class="table-wrap" data-reveal><table class="spec-table"><caption>보유 설비 (가상)</caption>
+      <thead><tr><th scope="col">종류</th><th scope="col">대수</th><th scope="col">가공 범위</th><th scope="col">최대 크기</th></tr></thead>
+      <tbody>{equipment.map(([k, n, r, s]) => <tr><th scope="row">{k}</th><td class="num" data-label="대수">{n}</td><td data-label="가공 범위">{r}</td><td class="num-l" data-label="최대 크기"><span class="num">{s}</span></td></tr>)}</tbody>
+    </table></div>
+    <p class="muted small" style="margin-top:var(--sp-4)">설비가 추가되면 소식에 사진과 함께 알려 드립니다.</p>
+  </div></section>
+
+  <PartHead id="quality" eyebrow="Quality control" title="다음 주문에도 같은 부품이 나오도록" lead="검사 순서와 검사 장비, 출하 성적서 안내입니다." />
+  <section class="section" data-component="ProcessSteps"><div class="container">
+    <div class="sec-head" data-reveal><span class="eyebrow">Inspection flow</span><h3 class="h2">검사 순서</h3></div>
+    <ProcessSteps steps={[
+      { no: 'STEP 01', title: '도면 검토', text: '공차와 가공 순서를 확인합니다.' },
+      { no: 'STEP 02', title: '첫 부품 전수 측정', text: '첫 부품의 모든 치수를 측정합니다.' },
+      { no: 'STEP 03', title: '공정 중 샘플 측정', text: '가공 중간에 샘플을 뽑아 측정합니다.' },
+      { no: 'STEP 04', title: '출하 전 최종 검사', text: '요청 시 성적서를 동봉합니다.' },
+    ]} headingLevel={4} />
+  </div></section>
+  <section class="section section--gray" data-component="InspectionEquipment"><div class="container">
+    <div class="photo-pair" data-reveal>
+      <figure><img src={img('quality-1.svg')} alt="정반 위의 알루미늄 부품과 높이 게이지 일러스트" width="1200" height="800" loading="lazy" /><figcaption>정반 위 측정(일러스트)</figcaption></figure>
+      <figure><img src={img('quality-2.svg')} alt="축 부품의 지름을 캘리퍼스로 재는 장면의 일러스트" width="1200" height="800" loading="lazy" /><figcaption>캘리퍼스 측정(일러스트)</figcaption></figure>
+    </div>
+    <p class="ai-note">검사 이미지는 연출용 일러스트이며 실제 측정 사진이 아닙니다.</p>
+    <div class="sec-head" style="margin-top:var(--sp-8)" data-reveal><span class="eyebrow">Inspection equipment</span><h3 class="h2">검사 장비</h3></div>
+    <div class="table-wrap" data-reveal data-component="SpecTable"><table class="spec-table"><caption>주요 검사 장비와 사용 단계</caption>
+      <thead><tr><th scope="col">장비</th><th scope="col">용도</th><th scope="col">사용 단계</th></tr></thead>
+      <tbody>{inspection.map(([k, u, s]) => <tr><th scope="row">{k}</th><td data-label="용도">{u}</td><td data-label="사용 단계">{s}</td></tr>)}</tbody>
+    </table></div>
+  </div></section>
+  <section class="section" data-component="CertificateNotice"><div class="container">
+    <Notice icon="file-text"><div><p><strong>출하 성적서 안내</strong></p><p class="muted" style="margin-top:4px">검사 결과 성적서가 필요하면 견적 문의에 요청 사항으로 적어 주세요. 요청하신 경우 출하 때 함께 보내 드립니다.</p></div></Notice>
+  </div></section>
+</BaseLayout>

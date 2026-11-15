@@ -16,7 +16,9 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present && node scripts/assemble.mjs",
     "check": "npm run check --workspaces --if-present && node scripts/check-dist.mjs",
-    "smoke": "node tests/smoke-landing-01.mjs",
+    "smoke": "node tests/smoke-landing-01.mjs && node tests/smoke-company-01.mjs",
+    "smoke:landing-01": "node tests/smoke-landing-01.mjs",
+    "smoke:company-01": "node tests/smoke-company-01.mjs",
     "preview": "node scripts/serve-dist.mjs",
     "zip": "python3 scripts/make_zips.py"
   },

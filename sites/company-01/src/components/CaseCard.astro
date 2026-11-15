@@ -1,0 +1,13 @@
+---
+import { img } from '../lib/url';
+export interface CaseItem { image: string; alt: string; title: string; material: string; process: string; use: string; specMaterial: string; specProcess: string; specUse: string }
+interface Props { item: CaseItem }
+const { item } = Astro.props;
+---
+<li class="case-card" data-component="CaseCard" data-case data-material={item.material} data-process={item.process} data-use={item.use}>
+  <img src={img(item.image)} alt={item.alt} width="600" height="600" loading="lazy" />
+  <div class="case-card__body">
+    <h3>{item.title}</h3>
+    <dl class="spec-dl"><dt>소재</dt><dd>{item.specMaterial}</dd><dt>공정</dt><dd>{item.specProcess}</dd><dt>용도</dt><dd>{item.specUse}</dd></dl>
+  </div>
+</li>

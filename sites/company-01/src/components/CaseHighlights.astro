@@ -1,0 +1,11 @@
+---
+import SectionHead from './SectionHead.astro';
+import CaseCard from './CaseCard.astro';
+import cases from '../data/cases.json';
+const home = cases.items.filter((c) => 'home' in c).sort((a, b) => (a as { home: number }).home - (b as { home: number }).home);
+---
+<section class="section section--gray" data-component="CaseHighlights"><div class="container">
+  <SectionHead eyebrow="Selected cases" title="대표 가공 사례" link={{ label: `사례 ${cases.items.length}건 모두 보기`, href: 'cases/' }} />
+  <ul class="case-grid case-grid--home" data-reveal>{home.map((c) => <CaseCard item={c} />)}</ul>
+  <p class="ai-note">부품 이미지는 연출용 일러스트이며 실제 제품 사진이 아닙니다. 거래처 이름은 싣지 않습니다.</p>
+</div></section>

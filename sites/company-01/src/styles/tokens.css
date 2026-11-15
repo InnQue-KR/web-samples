@@ -1,0 +1,77 @@
+/* DORAM 도람정밀 (company-01) — 디자인 토큰. 값만 둡니다. 컴포넌트 스타일은 site.css
+   글꼴 파일은 public/fonts/ 의 공식 파일(Pretendard 가변 dynamic-subset, IBM Plex Mono Latin1)을 레이아웃에서 link로 읽는다. */
+
+:root{
+  /* 색 — 남색 */
+  --c-navy-900:#0B1B34;
+  --c-navy-700:#12284A;   /* 제목·머리말·주 버튼 */
+  --c-navy-600:#1B3868;   /* 주 버튼 hover */
+  --c-navy-100:#E4EAF3;   /* 남색 옅은 면(선택 상태 등) */
+  /* 색 — 강철 회색 단계 */
+  --c-steel-900:#1B232C;  /* 본문 글자 */
+  --c-steel-700:#4B5662;  /* 보조 글자 */
+  --c-steel-600:#5B6673;
+  --c-steel-400:#8B96A3;  /* 장식·아이콘 전용(본문 글자 금지: 대비 3.0) */
+  --c-steel-300:#C9D0D8;  /* 선 */
+  --c-steel-200:#E1E6EB;  /* 옅은 선·구분 */
+  --c-steel-100:#EEF1F4;  /* 회색 면 */
+  --c-steel-50:#F6F8FA;   /* 아주 옅은 면 */
+  --c-white:#FFFFFF;
+  /* 색 — 신호 주황 (견적 문의 버튼·핵심 수치에만) */
+  --c-signal:#C94A0A;
+  --c-signal-hover:#A93D08;
+  --c-signal-soft:#FBEDE4;
+  /* 의미색 */
+  --c-error:#B3261E;
+  --c-focus:#1B5FD6;
+
+  /* 글꼴 */
+  --f-sans:"Pretendard Variable","Pretendard","Noto Sans KR","Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono","D2Coding","Noto Sans Mono CJK KR",ui-monospace,monospace;
+
+  /* 글자 크기 (데스크톱 / 아래 media에서 모바일 값으로 덮어씀) */
+  --fs-display:48px;  --lh-display:1.25;
+  --fs-h1:40px;       --lh-h1:1.3;
+  --fs-h2:28px;       --lh-h2:1.35;
+  --fs-h3:20px;       --lh-h3:1.45;
+  --fs-body:16px;     --lh-body:1.7;
+  --fs-lead:18px;     --lh-lead:1.7;
+  --fs-small:14px;    --lh-small:1.6;
+  --fs-label:13px;    --lh-label:1.4;
+  --fs-num-xl:44px;
+  --fw-regular:400; --fw-semibold:600; --fw-bold:700;
+  --ls-label:.04em;
+
+  /* 간격 (4px 단위) */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px; --sp-8:64px; --sp-9:96px;
+  --section-y:96px;     /* 구역 위아래 */
+  --gutter:24px;        /* 12단 격자 칸 사이 */
+  --page-pad:40px;      /* 좌우 여백 */
+  --container:1200px;   /* 본문 최대 폭 */
+  --container-wide:1440px;
+
+  /* 모서리·선·그림자 */
+  --r-0:0; --r-1:2px; --r-2:4px;
+  --bw:1px; --bw-strong:2px;
+  --shadow-menu:0 8px 24px rgba(11,27,52,.12);
+  --shadow-card:none;
+
+  /* 움직임 */
+  --t-fast:120ms; --t-base:200ms; --t-reveal:480ms;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --reveal-shift:12px;
+
+  /* 크기 */
+  --header-h:76px;
+  --strip-h:32px;
+  --tap:48px;
+}
+@media (max-width:1023px){
+  :root{--section-y:72px;--page-pad:32px}
+}
+@media (max-width:767px){
+  :root{
+    --fs-display:30px;--fs-h1:28px;--fs-h2:22px;--fs-h3:18px;--fs-lead:16px;--fs-num-xl:32px;
+    --section-y:56px;--page-pad:20px;--gutter:16px;--header-h:64px;
+  }
+}

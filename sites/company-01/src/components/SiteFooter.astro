@@ -1,0 +1,24 @@
+---
+import site from '../data/site.json';
+import { url } from '../lib/url';
+const b = site.business;
+---
+<footer class="site-footer" data-component="SiteFooter">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <img src={url('images/logo.svg')} alt="DORAM 도람정밀" width="220" height="40" loading="lazy" />
+      <p class="footer-info">{b.legalName} · {b.representative}<br />사업자등록번호 <span class="num">{b.businessNo}</span><br />{b.address}</p>
+    </div>
+    <nav class="footer-nav" aria-label="사이트 맵">
+      <h2>Site map</h2>
+      {site.footerNav.map((l) => <a href={url(l.href)}>{l.label}</a>)}
+    </nav>
+    <div class="footer-contact">
+      <h2>Contact</h2>
+      <p>전화 <a class="num" href="#" data-sample-notice="external" data-track="tel_click">{b.tel}</a><br />이메일 <span class="num">{b.email}</span><br />{b.hours}<br />{b.closed}</p>
+    </div>
+  </div>
+  <div class="disclosure" data-component="SampleDisclosure">
+    <div class="container"><p>{site.notice.footer}</p><p class="copy">{site.notice.copy}</p></div>
+  </div>
+</footer>

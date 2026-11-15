@@ -1,0 +1,17 @@
+---
+import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
+import { getNews, newsPath, ymd } from '../lib/news';
+import { url } from '../lib/url';
+const latest = (await getNews()).slice(0, 3);
+---
+<section class="section" data-component="NewsPreview"><div class="container">
+  <SectionHead eyebrow="News" title="최근 소식" link={{ label: '소식 전체 보기', href: 'news/' }} />
+  {latest.length ? (
+    <ul class="news-simple" data-reveal>
+      {latest.map((n) => (
+        <li><a href={url(newsPath(n))}><span class="d">{ymd(n.data.date)}</span><span class="t">{n.data.title}</span><Icon name="arrow-right" /></a></li>
+      ))}
+    </ul>
+  ) : <p class="muted">등록된 소식이 없습니다.</p>}
+</div></section>

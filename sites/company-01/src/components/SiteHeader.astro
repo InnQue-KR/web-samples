@@ -1,0 +1,41 @@
+---
+/** SiteHeader + GlobalNav. 1023px 이하에서는 펼침 메뉴(scripts/site.ts). 하위 메뉴 일부는 통합 페이지의 구역 앵커로 연결한다. */
+import Icon from './Icon.astro';
+import site from '../data/site.json';
+import { url } from '../lib/url';
+
+interface Props { current: string }
+const { current } = Astro.props;
+const pathOf = (href: string) => href.split('#')[0];
+// 하위 메뉴 중 같은 페이지(앵커 없음)이거나 앵커가 걸린 같은 페이지면 그 그룹이 현재 위치
+const isGroupCurrent = (item: (typeof site.nav)[number]) =>
+  item.children ? item.children.some((c) => pathOf(c.href) === current) : false;
+---
+<header class="site-header" data-component="SiteHeader">
+  <div class="container">
+    <a class="logo" href={url()} aria-label="DORAM 도람정밀 홈"><img src={url('images/logo.svg')} alt="DORAM 도람정밀" width="220" height="40" /></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="gnav" aria-label="메뉴 열기">
+      <Icon name="menu" class="icon-open" /><Icon name="x" class="icon-close" />
+    </button>
+    <nav aria-label="주 메뉴">
+      <ul class="gnav" id="gnav" data-component="GlobalNav">
+        {site.nav.map((item) =>
+          item.children ? (
+            <li class:list={[{ 'is-current': isGroupCurrent(item) }]}>
+              <button type="button" aria-expanded="false" data-submenu-toggle>{item.label}<Icon name="chevron-down" class="chev" /></button>
+              <ul class="submenu">
+                {item.children.map((c) => (
+                  <li><a href={url(c.href)} aria-current={c.href === current ? 'page' : undefined}>{c.label}</a></li>
+                ))}
+              </ul>
+            </li>
+          ) : item.cta ? (
+            <li class="nav-cta"><a href={url(item.href)} aria-current={item.href === current ? 'page' : undefined} data-track="nav_quote_click">{item.label}</a></li>
+          ) : (
+            <li><a href={url(item.href)} aria-current={item.href === current || (item.href === 'news/' && current.startsWith('news/')) ? 'page' : undefined}>{item.label}</a></li>
+          )
+        )}
+      </ul>
+    </nav>
+  </div>
+</header>

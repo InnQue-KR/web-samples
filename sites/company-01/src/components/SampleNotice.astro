@@ -1,0 +1,15 @@
+---
+/**
+ * 전화·메일 같은 외부 연결 대신 여는 안내창(<dialog>). 실제 tel:/mailto:/외부 주소는 만들지 않는다.
+ * [data-sample-notice="키"]를 누르면 data-messages[키]를 보여 준다. 닫으면 누른 요소로 초점이 돌아간다.
+ */
+import site from '../data/site.json';
+const messages = { external: site.notice.external };
+---
+<dialog class="sample-dialog" id="sampleDialog" aria-labelledby="sampleDialogTitle" aria-describedby="sampleDialogMsg" data-component="SampleNotice" data-messages={JSON.stringify(messages)}>
+  <form method="dialog">
+    <h2 id="sampleDialogTitle">샘플 사이트 안내</h2>
+    <p id="sampleDialogMsg">{site.notice.external}</p>
+    <div class="actions"><button class="btn btn--primary" type="submit">확인</button></div>
+  </form>
+</dialog>

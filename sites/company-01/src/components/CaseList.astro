@@ -1,0 +1,65 @@
+---
+/**
+ * CaseFilter + CaseList. 소재·공정·용도 칩으로 거른다(같은 줄은 하나만, 줄끼리는 모두 만족).
+ * JS가 없으면 칩은 숨기고 9건 전체를 보여 준다(filter[hidden] → 스크립트가 보이게 함).
+ */
+import CaseCard from './CaseCard.astro';
+import cases from '../data/cases.json';
+const groups = Object.entries(cases.filters) as [string, { label: string; values: string[] }][];
+const total = cases.items.length;
+---
+<section class="section" data-component="CaseList"><div class="container">
+  <div class="filter" data-component="CaseFilter" data-case-filter hidden>
+    {groups.map(([key, g]) => (
+      <div class="filter__row" role="group" aria-label={`${g.label} 필터`}>
+        <span class="filter__label" aria-hidden="true">{g.label}</span>
+        <div class="chips" data-filter-group={key}>
+          <button type="button" class="chip" data-value="" aria-pressed="true">전체</button>
+          {g.values.map((v) => <button type="button" class="chip" data-value={v} aria-pressed="false">{v}</button>)}
+        </div>
+      </div>
+    ))}
+    <div class="filter__foot"><p class="case-count" aria-live="polite">전체 {total}건 중 <b data-case-count>{total}</b>건</p><button type="button" class="btn-text" data-filter-reset>선택 모두 해제</button></div>
+  </div>
+  <ul class="case-grid" data-case-grid>{cases.items.map((c) => <CaseCard item={c} />)}</ul>
+  <p class="case-empty" data-case-empty hidden>조건에 맞는 사례가 없습니다. 선택을 바꾸거나 해제해 주세요.</p>
+  <p class="ai-note" style="margin-top:var(--sp-5)">부품 이미지는 연출용 일러스트이며 실제 제품 사진이 아닙니다.</p>
+</div></section>
+
+<script>
+  const filter = document.querySelector<HTMLElement>('[data-case-filter]');
+  const grid = document.querySelector<HTMLElement>('[data-case-grid]');
+  if (filter && grid) {
+    const cards = [...grid.querySelectorAll<HTMLElement>('[data-case]')];
+    const groups = [...filter.querySelectorAll<HTMLElement>('[data-filter-group]')];
+    const countEl = filter.querySelector<HTMLElement>('[data-case-count]');
+    const emptyEl = document.querySelector<HTMLElement>('[data-case-empty]');
+    const state: Record<string, string> = {};
+    const apply = () => {
+      let shown = 0;
+      cards.forEach((c) => {
+        const ok = Object.entries(state).every(([k, v]) => !v || c.dataset[k] === v);
+        c.hidden = !ok;
+        if (ok) shown++;
+      });
+      if (countEl) countEl.textContent = String(shown);
+      if (emptyEl) emptyEl.hidden = shown !== 0;
+    };
+    groups.forEach((group) => {
+      const key = group.dataset.filterGroup!;
+      const chips = [...group.querySelectorAll<HTMLButtonElement>('.chip')];
+      chips.forEach((chip) => chip.addEventListener('click', () => {
+        state[key] = chip.dataset.value ?? '';
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        apply();
+      }));
+    });
+    filter.querySelector('[data-filter-reset]')?.addEventListener('click', () => {
+      for (const k of Object.keys(state)) state[k] = '';
+      groups.forEach((g) => g.querySelectorAll('.chip').forEach((c, i) => c.setAttribute('aria-pressed', String(i === 0))));
+      apply();
+    });
+    filter.hidden = false;
+    apply();
+  }
+</script>

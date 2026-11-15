@@ -1,0 +1,23 @@
+---
+/** ③ NewsList. 글이 없으면 '등록된 소식이 없습니다' 한 줄. 쪽 이동은 한 쪽(10건)을 넘기 전까지 1만 표시. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/PageHead.astro';
+import { getNews, newsPath, ymd } from '../../lib/news';
+import { url } from '../../lib/url';
+const list = await getNews();
+---
+<BaseLayout frame="NewsList" current="news/" title="소식 | DORAM 도람정밀 (샘플)" description="도람정밀 소식(공지 게시판) 목록. (샘플 사이트, 가상 공지)">
+  <PageHead crumbs={[{ label: '소식' }]} title="소식" lead="도람정밀의 공지와 설비 소식입니다. 모든 글과 날짜는 가상입니다." />
+  <section class="section" data-component="NewsBoard"><div class="container">
+    <table class="board">
+      <caption class="sr-only">소식 목록</caption>
+      <thead><tr><th class="c-no" scope="col">번호</th><th scope="col">제목</th><th class="c-date" scope="col">작성일</th></tr></thead>
+      <tbody>
+        {list.length ? list.map((n, i) => (
+          <tr><td class="c-no">{list.length - i}</td><td class="c-title"><span class="tag">{n.data.tag}</span><a href={url(newsPath(n))}>{n.data.title}</a></td><td class="c-date">{ymd(n.data.date)}</td></tr>
+        )) : <tr><td class="c-empty" colspan="3">등록된 소식이 없습니다.</td></tr>}
+      </tbody>
+    </table>
+    <nav class="pager" aria-label="쪽 이동"><span aria-current="page">1</span></nav>
+  </div></section>
+</BaseLayout>

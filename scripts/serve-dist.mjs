@@ -27,5 +27,5 @@ export function startServer(port = 0) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const server = await startServer(Number(process.argv[2] ?? 4321));
-  console.log(`http://127.0.0.1:${server.address().port}/landing-01/`);
+  for (const id of ['landing-01', 'company-01']) console.log(`http://127.0.0.1:${server.address().port}/${id}/`);
 }

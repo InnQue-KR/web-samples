@@ -1,0 +1,21 @@
+---
+import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
+import { url, img } from '../lib/url';
+const fields = [
+  { no: 'FIELD 01', id: 's01', image: 'field-1.svg', alt: '정밀 부품 가공 일러스트: 구멍이 가공된 알루미늄 판재', title: '정밀 부품 가공', text: '알루미늄, 스테인리스, 엔지니어링 플라스틱 부품을 도면 공차에 맞춰 가공합니다.' },
+  { no: 'FIELD 02', id: 's02', image: 'field-2.svg', alt: '지그·픽스처 일러스트: 고정 핀이 서 있는 베이스 판', title: '지그·픽스처', text: '조립·검사 공정에 쓰는 고정구를 설계 검토부터 함께 만듭니다.' },
+  { no: 'FIELD 03', id: 's03', image: 'field-3.svg', alt: '시제품 일러스트: 원판, 블록, 핀 여러 개', title: '시제품·소량 생산', text: '1개부터 받습니다. 양산 전 형상 확인용 시제품을 빠르게 만듭니다.' },
+];
+---
+<section class="section" data-component="FieldCards"><div class="container">
+  <SectionHead eyebrow="What we make" title="가공 분야" link={{ label: '가공 서비스 전체 보기', href: 'services/' }} />
+  <div class="cards-3" data-reveal>
+    {fields.map((f) => (
+      <a class="field-card" href={url(`services/#${f.id}`)} data-component="FieldCard">
+        <img src={img(f.image)} alt={f.alt} width="800" height="600" loading="lazy" />
+        <div class="field-card__body"><span class="field-card__no">{f.no}</span><h3 class="h3">{f.title}</h3><p>{f.text}</p><span class="link-arrow">자세히 보기<Icon name="arrow-right" /></span></div>
+      </a>
+    ))}
+  </div>
+</div></section>

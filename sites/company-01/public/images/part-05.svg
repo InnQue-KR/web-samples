@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="MC나일론 부시"><defs>
+<linearGradient id="alu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9EDF1"/><stop offset=".5" stop-color="#C5CDD6"/><stop offset="1" stop-color="#9FAAB6"/></linearGradient>
+<linearGradient id="aluTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7F9FB"/><stop offset="1" stop-color="#D5DCE3"/></linearGradient>
+<linearGradient id="aluSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9AA5B1"/><stop offset="1" stop-color="#7C8794"/></linearGradient>
+<linearGradient id="ss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F6F8"/><stop offset=".25" stop-color="#C9D0D8"/><stop offset=".5" stop-color="#EEF1F4"/><stop offset=".78" stop-color="#9AA3AE"/><stop offset="1" stop-color="#C3CAD2"/></linearGradient>
+<linearGradient id="ssV" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9AA3AE"/><stop offset=".3" stop-color="#EEF1F4"/><stop offset=".55" stop-color="#C9D0D8"/><stop offset="1" stop-color="#7F8994"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4A5560"/><stop offset=".3" stop-color="#8A95A1"/><stop offset=".55" stop-color="#6A7683"/><stop offset="1" stop-color="#3B454F"/></linearGradient>
+<linearGradient id="steelTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8E99A5"/><stop offset="1" stop-color="#5C6772"/></linearGradient>
+<linearGradient id="steelSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#47525D"/><stop offset="1" stop-color="#363F48"/></linearGradient>
+<linearGradient id="pom" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBFAF6"/><stop offset="1" stop-color="#DAD7CC"/></linearGradient>
+<linearGradient id="pomV" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#CFCCC0"/><stop offset=".35" stop-color="#FBFAF6"/><stop offset="1" stop-color="#BDBAAE"/></linearGradient>
+<linearGradient id="dark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2B3844"/><stop offset="1" stop-color="#18222D"/></linearGradient>
+<radialGradient id="hole"><stop offset="0" stop-color="#3A4450"/><stop offset="1" stop-color="#1E2630"/></radialGradient>
+<radialGradient id="shadow"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+</defs><rect width="100%" height="100%" fill="#fff"/><ellipse cx="300" cy="500" rx="170" ry="30" fill="url(#shadow)"/><rect x="180" y="150" width="240" height="300" fill="url(#pomV)"/><ellipse cx="300" cy="450" rx="120" ry="40" fill="url(#pomV)"/><rect x="180" y="150" width="240" height="300" fill="url(#pomV)"/><ellipse cx="300" cy="150" rx="120" ry="40" fill="url(#pom)" stroke="#C9C6BA"/><ellipse cx="300" cy="150" rx="66.0" ry="22.0" fill="url(#hole)"/><ellipse cx="300" cy="154" rx="66.0" ry="22.0" fill="none" stroke="#fff" stroke-opacity=".6"/><rect x="180" y="270" width="240" height="10" fill="#B9B6AA" opacity=".6"/></svg>

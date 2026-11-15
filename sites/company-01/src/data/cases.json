@@ -1,0 +1,19 @@
+{
+  "_note": "가공 사례 9건(가상). material/process/use는 필터 값, spec*는 카드에 보이는 문구. home: 홈 대표 사례 순서.",
+  "filters": {
+    "material": { "label": "소재", "values": ["알루미늄", "스테인리스", "탄소강", "엔지니어링 플라스틱"] },
+    "process": { "label": "공정", "values": ["3축 밀링", "5축 가공", "CNC 선반", "복합 가공"] },
+    "use": { "label": "용도", "values": ["자동화 설비", "반도체 장비", "검사 장비", "지그·픽스처"] }
+  },
+  "items": [
+    { "image": "part-01.svg", "alt": "구멍과 긴 구멍이 가공된 알루미늄 검사 지그 베이스 플레이트 일러스트", "title": "검사 지그 베이스 플레이트", "material": "알루미늄", "process": "3축 밀링", "use": "검사 장비", "specMaterial": "알루미늄 6061", "specProcess": "3축 밀링", "specUse": "검사 장비 · 검사 지그", "home": 1 },
+    { "image": "part-02.svg", "alt": "단이 진 스테인리스 샤프트 일러스트", "title": "구동 샤프트", "material": "스테인리스", "process": "CNC 선반", "use": "자동화 설비", "specMaterial": "스테인리스 304", "specProcess": "CNC 선반 + 키홈", "specUse": "자동화 설비 · 구동부" },
+    { "image": "part-03.svg", "alt": "볼트 구멍이 뚫린 탄소강 플랜지 일러스트", "title": "커플링 플랜지", "material": "탄소강", "process": "복합 가공", "use": "자동화 설비", "specMaterial": "탄소강", "specProcess": "선반 + 밀링", "specUse": "자동화 설비 · 축 연결" },
+    { "image": "part-04.svg", "alt": "구멍과 포켓이 가공된 알루미늄 브래킷 일러스트", "title": "모듈 장착 브래킷", "material": "알루미늄", "process": "5축 가공", "use": "반도체 장비", "specMaterial": "알루미늄 7075", "specProcess": "5축 가공", "specUse": "반도체 장비 · 모듈 고정", "home": 2 },
+    { "image": "part-05.svg", "alt": "속이 빈 원통형 MC나일론 가이드 부시 일러스트", "title": "가이드 부시", "material": "엔지니어링 플라스틱", "process": "CNC 선반", "use": "자동화 설비", "specMaterial": "MC나일론", "specProcess": "CNC 선반", "specUse": "자동화 설비 · 슬라이드부" },
+    { "image": "part-06.svg", "alt": "가운데 홈이 있는 스테인리스 클램프 블록 일러스트", "title": "클램프 블록", "material": "스테인리스", "process": "3축 밀링", "use": "지그·픽스처", "specMaterial": "스테인리스 303", "specProcess": "3축 밀링", "specUse": "지그·픽스처 · 고정구", "home": 3 },
+    { "image": "part-07.svg", "alt": "핀 형태의 방열 핀이 가공된 알루미늄 블록 일러스트", "title": "방열 블록", "material": "알루미늄", "process": "3축 밀링", "use": "반도체 장비", "specMaterial": "알루미늄 6061", "specProcess": "3축 밀링", "specUse": "반도체 장비 · 방열" },
+    { "image": "part-08.svg", "alt": "톱니 모양 가장자리를 가진 POM 기어 플레이트 일러스트", "title": "POM 기어 플레이트", "material": "엔지니어링 플라스틱", "process": "3축 밀링", "use": "자동화 설비", "specMaterial": "POM", "specProcess": "3축 밀링", "specUse": "자동화 설비 · 이송부" },
+    { "image": "part-09.svg", "alt": "단이 있는 탄소강 위치결정 핀 홀더 일러스트", "title": "위치결정 핀 홀더", "material": "탄소강", "process": "복합 가공", "use": "지그·픽스처", "specMaterial": "탄소강", "specProcess": "선반 + 밀링", "specUse": "지그·픽스처 · 위치결정" }
+  ]
+}

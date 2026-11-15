@@ -1,0 +1,20 @@
+{
+  "name": "company-01",
+  "private": true,
+  "description": "도람정밀 (가상) 기업 홈페이지 DELUXE 샘플",
+  "type": "module",
+  "scripts": {
+    "fonts": "copy-pretendard public",
+    "dev": "npm run fonts && astro dev",
+    "build": "npm run fonts && astro build",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@web-samples/sample-kit": "0.1.0",
+    "astro": "7.4.12"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "typescript": "6.0.3"
+  }
+}

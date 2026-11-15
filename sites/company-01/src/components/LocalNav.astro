@@ -1,0 +1,11 @@
+---
+/** LocalNav(그룹 탭). current와 같은 경로만 aria-current="page". 통합 페이지의 구역은 '#앵커' 링크. */
+import { url } from '../lib/url';
+interface Props { items: { label: string; href: string }[]; current: string }
+const { items, current } = Astro.props;
+---
+<nav class="subnav" data-component="LocalNav" aria-label="하위 메뉴">
+  <div class="container"><ul>
+    {items.map((it) => <li><a href={url(it.href)} aria-current={it.href === current ? 'page' : undefined}>{it.label}</a></li>)}
+  </ul></div>
+</nav>

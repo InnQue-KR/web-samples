@@ -1,0 +1,21 @@
+---
+/** PageHead: 경로(+ 제목·한 줄 설명). 소식 상세는 경로만. 마지막 경로 항목은 현재 위치(aria-current). */
+import { url } from '../lib/url';
+interface Crumb { label: string; href?: string }
+interface Props { crumbs: Crumb[]; title?: string; lead?: string }
+const { crumbs, title, lead } = Astro.props;
+---
+<section class="page-head" data-component="PageHead">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="현재 위치">
+      <ol>
+        <li><a href={url()}>홈</a></li>
+        {crumbs.map((c, i) => (
+          <li>{i === crumbs.length - 1 ? <span aria-current="page">{c.label}</span> : <a href={url(c.href)}>{c.label}</a>}</li>
+        ))}
+      </ol>
+    </nav>
+    {title && <h1>{title}</h1>}
+    {lead && <p class="lead">{lead}</p>}
+  </div>
+</section>

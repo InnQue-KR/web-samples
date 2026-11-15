@@ -37,11 +37,15 @@ ${body}
 </html>
 `;
 
-writeFileSync(join(out, 'index.html'), page('가상 샘플 사이트 모음', `<h1>가상 샘플 사이트 모음</h1>
-<ul>
+const sampleList = `<ul>
 ${samples.map((s) => `<li><a href="/${s.id}/">${esc(s.name)} (가상)</a> · <code>${s.id}</code></li>`).join('\n')}
-</ul>`));
+</ul>`;
+writeFileSync(join(out, 'index.html'), page('가상 샘플 사이트 모음', `<h1>가상 샘플 사이트 모음</h1>
+${sampleList}`));
+// GitHub Pages는 하위 경로(/company-01/없는주소)에도 이 루트 404를 보여 준다. 각 샘플 시작 화면으로 바로 갈 수 있게 목록을 둔다.
 writeFileSync(join(out, '404.html'), page('페이지를 찾을 수 없습니다', `<h1>페이지를 찾을 수 없습니다</h1>
+<p>주소가 바뀌었거나 없는 페이지입니다. 아래 샘플의 시작 화면으로 이동해 주세요.</p>
+${sampleList}
 <p><a href="/">샘플 모음으로</a></p>`));
 // GitHub Pages가 _astro/ 폴더를 무시하지 않게 한다.
 writeFileSync(join(out, '.nojekyll'), '');

@@ -1,0 +1,127 @@
+---
+/**
+ * 견적 문의 샘플 폼. 입력 5개(회사명·담당자 이름·연락처·품목·수량·요청 사항), 첨부 없음, 동의 2개(필수/선택).
+ * 입력값은 전송·저장하지 않는다. 잠금 방식은 @web-samples/sample-kit/sample-form 주석 참고.
+ *  - 입력·동의 칸에는 name 속성을 두지 않는다(혹시 제출돼도 주소에 값이 붙지 않음).
+ *  - 모든 입력과 보내기 버튼은 <fieldset data-sample-lock disabled> 안에 있고 스크립트가 붙어야 풀린다.
+ *  - 칸별 오류에는 role=alert를 두지 않고 위쪽 요약(role=alert) 한 곳에서만 읽게 한다.
+ */
+import Icon from './Icon.astro';
+import site from '../data/site.json';
+import { url } from '../lib/url';
+const b = site.business;
+---
+<form class="quote-form" id="quoteForm" novalidate data-component="QuoteForm" aria-label="견적 문의">
+  <p class="notice form-js-off" data-sample-js-off>이 샘플 양식은 브라우저의 자바스크립트가 켜져 있어야 입력할 수 있습니다. 어떤 경우에도 입력값은 전송되지 않습니다. 전화 상담 안내는 오른쪽(휴대폰은 아래) [전화 상담]을 봐 주세요.</p>
+  <fieldset class="form-lock" data-sample-lock disabled>
+    <legend class="sr-only">견적 문의 입력</legend>
+    <p class="small muted" style="margin-bottom:var(--sp-5)"><span class="req" style="margin-left:0">*</span> 표시는 필수 항목입니다.</p>
+    <div class="notice form-summary" id="formSummary" role="alert" tabindex="-1"></div>
+
+    <div class="field" id="f-company-wrap"><label for="f-company">회사명<span class="req">* 필수</span></label><input type="text" id="f-company" autocomplete="organization" maxlength="50" required aria-required="true" aria-describedby="f-company-err" /><span class="error" id="f-company-err"></span></div>
+    <div class="field" id="f-name-wrap"><label for="f-name">담당자 이름<span class="opt">선택</span></label><input type="text" id="f-name" autocomplete="name" maxlength="30" aria-describedby="f-name-hint" /><span class="hint" id="f-name-hint">입력하시면 아래 [선택] 이름 수집·이용 동의에 체크해 주세요.</span></div>
+    <div class="field" id="f-contact-wrap"><label for="f-contact">연락처(전화 또는 이메일)<span class="req">* 필수</span></label><input type="text" id="f-contact" inputmode="email" autocomplete="email" maxlength="100" placeholder="전화번호 또는 이메일" required aria-required="true" aria-describedby="f-contact-err" /><span class="error" id="f-contact-err"></span></div>
+    <div class="field" id="f-item-wrap"><label for="f-item">품목·수량<span class="req">* 필수</span></label><input type="text" id="f-item" maxlength="100" placeholder="예: 지그 플레이트 · 알루미늄 · 10개" required aria-required="true" aria-describedby="f-item-err" /><span class="error" id="f-item-err"></span></div>
+    <div class="field" id="f-memo-wrap"><label for="f-memo">요청 사항<span class="opt">선택</span></label><textarea id="f-memo" maxlength="1000" placeholder="희망 납기, 공차·표면 처리 요청, 성적서 필요 여부 등" aria-describedby="f-memo-hint f-memo-err"></textarea><span class="hint" id="f-memo-hint">최대 1,000자. 도면 파일은 문의 폼으로 받지 않습니다. 접수 확인 연락을 드린 뒤 이메일(<a class="num" href="#" data-sample-notice="external" data-track="mail_click">{b.email}</a>)로 보내 주세요.</span><span class="error" id="f-memo-err"></span></div>
+
+    <div class="consent" id="consent-required-box" data-component="ConsentRequired"><h3>[필수] 견적 문의 처리를 위한 개인정보 수집·이용 동의</h3>
+      <p><strong>샘플 시연:</strong> 이 양식에 입력한 값은 지금 보고 계신 화면 안에서 입력 형식을 확인하는 데만 쓰고, 서버·외부 서비스로 보내거나 쿠키·브라우저 저장소·주소창에 남기지 않습니다. 확인을 마치면 화면에서도 지웁니다.</p>
+      <p style="margin-top:var(--sp-2)"><strong>실제 납품 문안(예시):</strong> 수집·이용 주체: 도람정밀(가상). 목적: 견적 문의 확인 및 답변. 항목: 회사명, 연락처(전화 또는 이메일), 품목·수량, 요청 사항. 보유·이용 기간: 답변 완료 후 지체 없이 삭제하며, 미완료 문의도 접수일부터 최대 30일 보관합니다. 동의를 거부할 수 있으며, 거부하면 이 문의 폼을 이용할 수 없습니다. 전화 <span class="num">{b.tel}</span> 등 다른 상담 방법을 이용할 수 있습니다. 문의 및 권리 행사: <span class="num">{b.tel}</span>(가상). 자세한 내용은 <a href={url('privacy/')}>개인정보처리방침</a>을 확인해 주세요.</p>
+      <label><input type="checkbox" id="c-required" required aria-required="true" aria-describedby="c-required-err" />위 개인정보 수집·이용에 동의합니다. (샘플: 실제로 수집하지 않음)</label><p class="error" id="c-required-err">문의를 보내려면 [필수] 동의에 체크해 주세요.</p></div>
+    <div class="consent" id="consent-name-box" data-component="ConsentOptional"><h3>[선택] 이름 수집·이용 동의</h3>
+      <p>목적: 문의 담당자 식별. 항목: 이름. 보유·이용 기간: 위 문의 기록과 동일. 동의하지 않아도 문의할 수 있습니다. 이 샘플에서는 이름도 저장·전송하지 않습니다.</p>
+      <label><input type="checkbox" id="c-name" aria-describedby="c-name-err" />이름의 수집·이용에 동의합니다.</label><p class="error" id="c-name-err">이름을 입력하셨다면 [선택] 이름 동의에 체크해 주세요. 이름을 비워 두셔도 문의할 수 있습니다.</p></div>
+
+    <button class="btn btn--signal btn--lg" type="submit" style="width:100%" data-track="quote_submit_click">견적 문의 보내기<Icon name="arrow-right" /></button>
+  </fieldset>
+  <div class="notice form-result" id="formResult" role="status" tabindex="-1" data-component="SampleFormResult">
+    <Icon name="info" />
+    <div><p><strong>{site.notice.formTitle}</strong><br />{site.notice.formBody}</p><p class="small muted" style="margin-top:4px">입력하신 값은 보내거나 저장하지 않았고, 화면에서도 지웠습니다.</p></div>
+  </div>
+</form>
+
+<script>
+  import { armSampleForm } from '@web-samples/sample-kit/sample-form';
+
+  const form = document.getElementById('quoteForm') as HTMLFormElement | null;
+  if (form) {
+    const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+    const summary = el<HTMLElement>('formSummary');
+    const result = el<HTMLElement>('formResult');
+    const val = (id: string) => el<HTMLInputElement>(id).value.trim();
+    const consentReq = el<HTMLInputElement>('c-required');
+    const consentName = el<HTMLInputElement>('c-name');
+    const reqBox = el<HTMLElement>('consent-required-box');
+    const nameBox = el<HTMLElement>('consent-name-box');
+
+    const setFieldError = (id: string, text: string) => {
+      const wrap = el<HTMLElement>(`${id}-wrap`);
+      wrap.classList.toggle('has-error', Boolean(text));
+      const err = document.getElementById(`${id}-err`);
+      if (err) err.textContent = text;
+      el<HTMLInputElement>(id).setAttribute('aria-invalid', text ? 'true' : 'false');
+    };
+    const setBoxError = (box: HTMLElement, input: HTMLInputElement, on: boolean) => {
+      box.classList.toggle('has-error', on);
+      input.setAttribute('aria-invalid', on ? 'true' : 'false');
+    };
+    const clearAll = () => {
+      ['f-company', 'f-contact', 'f-item', 'f-memo'].forEach((id) => setFieldError(id, ''));
+      setBoxError(reqBox, consentReq, false);
+      setBoxError(nameBox, consentName, false);
+      summary.textContent = '';
+      summary.classList.remove('is-visible');
+    };
+
+    // 문제 목록(화면 순서). 값 자체는 어디에도 남기지 않는다.
+    const check = () => {
+      const problems: { focus: HTMLElement; msg: string }[] = [];
+      const field = (id: string, msg: string) => { setFieldError(id, msg); problems.push({ focus: el(id), msg }); };
+      const company = val('f-company');
+      if (!company) field('f-company', '회사명을 입력해 주세요.');
+      else if (company.length > 50) field('f-company', '회사명은 50자 이내로 입력해 주세요.');
+      const c = val('f-contact');
+      const isMail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(c);
+      const isTel = /^[0-9+\-\s()]{8,}$/.test(c) && c.replace(/\D/g, '').length >= 8 && c.replace(/\D/g, '').length <= 15;
+      if (!c) field('f-contact', '전화번호 또는 이메일을 입력해 주세요.');
+      else if (c.length > 100 || (!isMail && !isTel)) field('f-contact', '전화번호(예: 000-0000-0000) 또는 이메일 형식으로 입력해 주세요.');
+      const item = val('f-item');
+      if (!item) field('f-item', '품목과 수량을 입력해 주세요. 예: 검사 지그 플레이트 알루미늄 6061, 10개');
+      else if (item.length > 100) field('f-item', '품목·수량은 100자 이내로 입력해 주세요.');
+      if (val('f-memo').length > 1000) field('f-memo', '요청 사항은 1,000자 이내로 입력해 주세요.');
+      if (val('f-name').length > 30) problems.push({ focus: el('f-name'), msg: '담당자 이름은 30자 이내로 입력해 주세요.' });
+      if (!consentReq.checked) { setBoxError(reqBox, consentReq, true); problems.push({ focus: consentReq, msg: '[필수] 개인정보 수집·이용 동의가 필요합니다.' }); }
+      if (val('f-name') && !consentName.checked) { setBoxError(nameBox, consentName, true); problems.push({ focus: consentName, msg: '이름을 입력하셨다면 [선택] 이름 동의에 체크해 주세요.' }); }
+      return problems;
+    };
+
+    armSampleForm(form, {
+      validate: () => {
+        clearAll();
+        result.classList.remove('is-visible');
+        const problems = check();
+        if (!problems.length) return true;
+        summary.textContent = `확인이 필요한 항목이 ${problems.length}개 있습니다. ${problems.map((p) => p.msg).join(' / ')}`;
+        summary.classList.add('is-visible');
+        problems[0]!.focus.focus();
+        return false;
+      },
+      // 실제 납품에서는 이 지점에서 외부 폼(접수 알림)으로 연결한다. 샘플은 요청을 보내지 않는다.
+      onDone: () => {
+        clearAll();
+        result.classList.add('is-visible');
+        result.focus();
+      },
+    });
+
+    // 고친 칸의 오류는 바로 지운다
+    form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach((input) => {
+      input.addEventListener('input', () => {
+        const wrap = input.closest('.field');
+        if (wrap?.classList.contains('has-error')) setFieldError(input.id, '');
+        if (input instanceof HTMLInputElement && input.type === 'checkbox' && input.checked) setBoxError(input.closest('.consent') as HTMLElement, input, false);
+        result.classList.remove('is-visible');
+      });
+    });
+  }
+</script>

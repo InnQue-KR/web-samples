@@ -1,0 +1,9 @@
+---
+/** ProcessSteps: 가로 4칸(품질 관리) / 세로형(견적 문의 옆). */
+interface Props { steps: { no: string; title: string; text: string }[]; vertical?: boolean; headingLevel?: 3 | 4 }
+const { steps, vertical = false, headingLevel = 3 } = Astro.props;
+const H = headingLevel === 3 ? 'h3' : 'h4';
+---
+<ol class:list={['steps', { 'steps--vertical': vertical }]} style={vertical ? 'border:0' : undefined} data-reveal={vertical ? undefined : ''}>
+  {steps.map((s) => <li class="step"><span class="no">{s.no}</span><H class="step__title">{s.title}</H><p>{s.text}</p></li>)}
+</ol>
