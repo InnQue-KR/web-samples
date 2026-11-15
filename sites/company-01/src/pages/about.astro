@@ -27,7 +27,8 @@ const history = [
   <LocalNav current="about/" items={[{ label: '회사 소개', href: 'about/' }, { label: '연혁·인증', href: 'about/#history' }, { label: '오시는 길', href: 'about/#access' }]} />
 
   <section class="section" data-component="Greeting"><div class="container"><div class="split">
-    <figure class="split__media" data-reveal><img src={img('factory.svg')} alt="간판이 없는 단층 공장 건물 외관 일러스트" width="1600" height="900" loading="lazy" /><figcaption>공장 외관(일러스트). 실제 사진이 아닙니다.</figcaption></figure>
+    {/* 공장 그림은 모바일 첫 화면의 LCP 요소라 지연 로딩·등장 효과를 쓰지 않고 동기 디코딩한다(INNA-644 측정) */}
+    <figure class="split__media"><img src={img('factory.svg')} alt="간판이 없는 단층 공장 건물 외관 일러스트" width="1600" height="900" fetchpriority="high" decoding="sync" /><figcaption>공장 외관(일러스트). 실제 사진이 아닙니다.</figcaption></figure>
     <div class="split__text" data-reveal><span class="eyebrow">Message</span><h2 class="h2">대표 인사말</h2>
       <div class="greeting">
         <p>도람정밀은 자동화 설비 부품을 가공해 온 회사입니다. 저희가 가장 중요하게 여기는 것은 도면에 적힌 숫자와 약속한 납기입니다.</p>
@@ -69,7 +70,7 @@ const history = [
   <section class="section section--gray" data-component="CertList"><div class="container"><div class="grid">
     <div class="g-head" data-reveal><span class="eyebrow">Certification</span><h3 class="h2" style="margin-top:12px">인증</h3><p class="muted small" style="margin-top:12px">인증은 글자로만 표기합니다. 인증기관의 로고는 쓰지 않습니다.</p></div>
     <div class="g-body" data-reveal><div class="cert-list">
-      <div class="cert"><span class="k">CERT 01</span><span class="v">품질경영시스템 인증</span><p class="small muted"><span class="num">2021</span>년 취득, <span class="num">2025</span>년 갱신 심사 완료(가상)</p></div>
+      <div class="cert"><span class="k">CERT 01</span><span class="v">품질경영시스템 인증</span><p class="small muted"><span class="num">2021</span>년 취득, <span class="num">2026</span>년 갱신 심사 완료(가상)</p></div>
       <div class="cert"><span class="k">COPY</span><span class="v">인증서 사본</span><p class="small muted">거래처 요청 시 견적 문의로 알려 주시면 제공합니다(가상).</p></div>
     </div></div>
   </div></div></section>

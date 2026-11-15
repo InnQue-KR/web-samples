@@ -7,14 +7,23 @@
 | 바꿀 것 | 위치 | 방법 |
 |---|---|---|
 | 상호·대표·사업자번호·주소·전화·이메일·운영 시간·설립·인원·면적 | `src/data/site.json` → `business` | 값만 고치면 머리말·바닥글·회사 개요·오시는 길·견적 안내·동의 문안에 함께 반영 |
-| 메뉴 | `site.json` → `nav`, `footerNav` | `href`는 base 없이(`about/#history`) |
+| 메뉴 | `site.json` → `nav`, `footerNav` | `href`는 base 없이(`about/#history`). 펼침 메뉴의 초점 가두기(inert)·Esc 닫기·하위 메뉴 표시와 `aria-expanded` 맞춤은 `src/scripts/site.ts`가 자동으로 하므로 항목만 고치면 됩니다. JS가 꺼지거나 실패하면 1023px 이하에서 메뉴 버튼 대신 모든 메뉴를 펼친 목록으로 보여 줍니다(`html.js` 기준, `site.css`) |
 | 바닥글 고지·샘플 띠·안내창 문구 | `site.json` → `notice` | 실제 납품 때 샘플 띠·샘플 고지는 삭제 |
 | 페이지 제목·설명(SEO) | 각 `src/pages/*.astro`의 `title`, `description` / 홈은 `site.json` → `seo` | |
 | 가공 사례 | `src/data/cases.json` | 필터 값(`filters`)과 각 사례의 `material/process/use`가 정확히 같아야 걸러짐. 홈 대표 사례는 `home: 1~3` |
 | 공지 추가 | `src/content/news/<영문-주소>.md` | 맨 위에 `title`, `date`(YYYY-MM-DD), `tag`(공지·설비·인증), `description`, 선택 `image`(public/images 파일명)·`imageAlt`. 목록 번호·홈 최근 3건·이전/다음 글은 자동 |
-| 사진 교체 | `public/images/` | 같은 비율(4:3, 1:1, 3:2, 16:9, 15:8)로 넣고 `src`·대체 텍스트·"일러스트 · 실제 사진이 아닙니다" 문구·`docs/assets.csv`를 함께 고침. 제조사 로고·회사 각인 금지, 사람은 손만 |
+| 사진 교체 | `public/images/` | 같은 비율(4:3, 1:1, 3:2, 16:9, 15:8)로 넣고 `src`·대체 텍스트·"일러스트 · 실제 사진이 아닙니다" 문구·`docs/assets.csv`를 함께 고침. 제조사 로고·회사 각인 금지, 사람은 손만. **첫 화면 그림**(홈 `Hero.astro`, 가공 서비스 첫 구역, 회사 소개 공장 그림)은 `loading="lazy"`·`data-reveal`를 붙이지 말고 `fetchpriority="high" decoding="sync"`를 유지합니다(모바일 LCP). 그 아래 그림은 `loading="lazy"` |
+| 인증 연도·내용 | `src/pages/about.astro`(인증 카드) + `src/content/news/quality-certification-renewal.md`(공지 날짜) | 둘을 함께 고쳐 연도가 맞게 둡니다(지금은 둘 다 2026, 가상). 실제 인증을 확인하기 전에는 "(가상)" 표기를 지우지 않습니다 |
+| 견적 폼 칸 | `src/components/QuoteForm.astro` | 칸을 더하거나 빼면 `check()`(검사·오류 문구)와 `clearFieldErrors()`(오류 지우기)에 함께 반영. 오류 요약은 제출에 실패한 뒤 칸을 고칠 때마다 자동으로 개수·문구가 바뀌고 0개면 숨습니다 |
 
 고친 뒤 루트에서 `npm run build && npm run check && npm run smoke:company-01`.
+
+메뉴·폼·첫 화면 그림을 고쳤다면 다음도 확인합니다(smoke에 자동 검사가 있음).
+
+- 360·768에서 메뉴를 열고 Tab·Shift+Tab을 여러 번 눌러도 초점이 메뉴 뒤 본문으로 가지 않는지. 닫기·Esc·링크·화면 넓히기 뒤 본문을 다시 누를 수 있는지
+- 1280에서 하위 메뉴를 hover·Tab으로 연 뒤 Esc로 닫히고, 밖으로 나갔다 오면 다시 열리는지
+- 견적 폼 빈 제출 뒤 칸을 고칠 때 요약 개수가 줄고 0개면 사라지는지
+- 속도를 다시 잴 때: Lighthouse 모바일 기본값으로 화면마다 3회 재서 중앙값을 쓰고, 압축(gzip) 여부와 측정 PC의 CPU 지수(`benchmarkIndex`)를 함께 적습니다. 같은 PC라도 부하에 따라 LCP가 1초 넘게 흔들리므로 고치기 전·후를 번갈아 재야 비교가 됩니다
 
 ## 2. 공지가 10건을 넘을 때
 

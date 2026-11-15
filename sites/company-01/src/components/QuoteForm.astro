@@ -14,7 +14,7 @@ const b = site.business;
 <form class="quote-form" id="quoteForm" novalidate data-component="QuoteForm" aria-label="견적 문의">
   <p class="notice form-js-off" data-sample-js-off>이 샘플 양식은 브라우저의 자바스크립트가 켜져 있어야 입력할 수 있습니다. 어떤 경우에도 입력값은 전송되지 않습니다. 전화 상담 안내는 오른쪽(휴대폰은 아래) [전화 상담]을 봐 주세요.</p>
   <fieldset class="form-lock" data-sample-lock disabled>
-    <legend class="sr-only">견적 문의 입력</legend>
+    <h2 class="sr-only">견적 문의 입력</h2>
     <p class="small muted" style="margin-bottom:var(--sp-5)"><span class="req" style="margin-left:0">*</span> 표시는 필수 항목입니다.</p>
     <div class="notice form-summary" id="formSummary" role="alert" tabindex="-1"></div>
 
@@ -65,13 +65,19 @@ const b = site.business;
       box.classList.toggle('has-error', on);
       input.setAttribute('aria-invalid', on ? 'true' : 'false');
     };
-    const clearAll = () => {
+    const clearFieldErrors = () => {
       ['f-company', 'f-contact', 'f-item', 'f-memo'].forEach((id) => setFieldError(id, ''));
       setBoxError(reqBox, consentReq, false);
       setBoxError(nameBox, consentName, false);
-      summary.textContent = '';
-      summary.classList.remove('is-visible');
     };
+    /* 요약 상자: 0개면 비우고 숨김. role=alert라 입력 중에는 글자가 실제로 바뀔 때만 다시 써서 같은 내용을 거듭 읽지 않게 하고,
+     * 제출 때(force)는 같은 내용이어도 다시 써서 다시 알린다. 초점은 옮기지 않는다. */
+    const showSummary = (problems: { msg: string }[], force = false) => {
+      const text = problems.length ? `확인이 필요한 항목이 ${problems.length}개 있습니다. ${problems.map((p) => p.msg).join(' / ')}` : '';
+      if (force || summary.textContent !== text) summary.textContent = text;
+      summary.classList.toggle('is-visible', problems.length > 0);
+    };
+    const clearAll = () => { clearFieldErrors(); showSummary([]); };
 
     // 문제 목록(화면 순서). 값 자체는 어디에도 남기지 않는다.
     const check = () => {
@@ -97,12 +103,12 @@ const b = site.business;
 
     armSampleForm(form, {
       validate: () => {
-        clearAll();
+        clearFieldErrors();
         result.classList.remove('is-visible');
         const problems = check();
+        showSummary(problems, true);
         if (!problems.length) return true;
-        summary.textContent = `확인이 필요한 항목이 ${problems.length}개 있습니다. ${problems.map((p) => p.msg).join(' / ')}`;
-        summary.classList.add('is-visible');
+        // 실패하면 입력값은 그대로 두고(보내지 않음) 첫 문제 칸으로 초점
         problems[0]!.focus.focus();
         return false;
       },
@@ -114,14 +120,13 @@ const b = site.business;
       },
     });
 
-    // 고친 칸의 오류는 바로 지운다
-    form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach((input) => {
-      input.addEventListener('input', () => {
-        const wrap = input.closest('.field');
-        if (wrap?.classList.contains('has-error')) setFieldError(input.id, '');
-        if (input instanceof HTMLInputElement && input.type === 'checkbox' && input.checked) setBoxError(input.closest('.consent') as HTMLElement, input, false);
-        result.classList.remove('is-visible');
-      });
-    });
+    // 제출에 실패해 요약이 떠 있는 동안에는 칸을 고칠 때마다 전체를 다시 검사해 칸별 오류·요약 개수·문구를 함께 맞춘다.
+    // (이름을 지우면 [선택] 이름 동의 오류도 사라짐) 0개가 되면 요약을 숨긴다. 초점은 옮기지 않는다.
+    (['input', 'change'] as const).forEach((type) => form.addEventListener(type, () => {
+      result.classList.remove('is-visible');
+      if (!summary.classList.contains('is-visible')) return;
+      clearFieldErrors();
+      showSummary(check());
+    }));
   }
 </script>

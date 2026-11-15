@@ -40,6 +40,9 @@ const { frame, current, title = site.seo.title, description = site.seo.descripti
       ogImageHeight={site.seo.ogImageHeight}
       ogImageAlt={site.seo.ogImageAlt}
     >
+      {/* 스크립트가 돌 때만 모바일 메뉴를 접는다(html.js). 사이트 스크립트가 실패해 메뉴가 준비되지 않으면 load 때 다시 펼친 목록으로.
+          스타일시트보다 앞에 둔다: 뒤에 두면 CSS를 다 받을 때까지 HTML 해석이 멈춰 LCP가 늦어진다(INNA-644 측정) */}
+      <script is:inline>document.documentElement.classList.add('js');addEventListener('load',function(){if(!document.querySelector('[data-menu-ready]'))document.documentElement.classList.remove('js')});</script>
       <link rel="stylesheet" href={url('fonts/pretendard/pretendardvariable-dynamic-subset.css')} />
       <link rel="stylesheet" href={url('fonts/plex-mono/plex-mono.css')} />
     </SampleHead>

@@ -51,8 +51,9 @@ const inspection = [
 
   <section class="section" data-component="ServiceBlocks"><div class="container">
     {services.map((s, i) => (
-      <div class:list={['split', { 'split--rev': i === 1 }]} id={s.id} style={`margin-bottom:${i < services.length - 1 ? 'var(--sp-9)' : '0'}`} data-reveal data-component="ServiceBlock">
-        <figure class="split__media"><img src={img(s.image)} alt={s.alt} width="800" height="600" loading="lazy" /></figure>
+      <div class:list={['split', { 'split--rev': i === 1 }]} id={s.id} style={`margin-bottom:${i < services.length - 1 ? 'var(--sp-9)' : '0'}`} data-reveal={i === 0 ? undefined : ''} data-component="ServiceBlock">
+        {/* 첫 서비스 구역은 모바일 첫 화면의 LCP 그림이 있어 지연 로딩·등장 효과(처음 투명)를 쓰지 않고, 첫 그리기에 함께 그려지도록 동기 디코딩한다(INNA-644 측정). 나머지는 그대로 */}
+        <figure class="split__media"><img src={img(s.image)} alt={s.alt} width="800" height="600" loading={i === 0 ? undefined : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding={i === 0 ? 'sync' : undefined} /></figure>
         <div class="split__text">
           <span class="field-card__no">{s.no}</span><h2 class="h2">{s.title}</h2><p class="lead">{s.lead}</p>
           <ul class="checks">{s.points.map((p) => <li><span class="checks__icon"><Icon name="check" /></span><span>{p}</span></li>)}</ul>

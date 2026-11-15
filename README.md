@@ -30,7 +30,7 @@ npm run check          # astro check(타입) + dist 정적 검사(noindex·샘�
 npx playwright install chromium   # smoke 처음 한 번
 npm run smoke          # 두 사이트 브라우저 smoke → qa-output/<sample-id>/smoke.json, PNG
 npm run smoke:landing-01   # 랜딩만(92개 항목)
-npm run smoke:company-01   # 기업만(125개 항목)
+npm run smoke:company-01   # 기업만(166개 항목)
 npm run preview        # http://127.0.0.1:4321/landing-01/ · /company-01/ (dist를 GitHub Pages처럼 제공, 없는 경로는 루트 404)
 npm run zip            # out/ 에 소스 ZIP·배포 ZIP과 SHA-256
 ```

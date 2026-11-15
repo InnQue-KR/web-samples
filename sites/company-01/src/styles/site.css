@@ -323,6 +323,11 @@ figcaption{font-size:var(--fs-small);color:var(--c-steel-700);margin-top:var(--s
 .js-reveal [data-reveal].is-in{opacity:1;transform:none}
 
 /* ---------- 반응형 ---------- */
+/* 데스크톱 하위 메뉴: Esc로 닫은 뒤에는 포인터·초점이 그 메뉴를 벗어날 때까지 hover/focus-within으로 다시 열리지 않음(site.ts) */
+@media (min-width:1024px){
+  .gnav li.is-dismissed>.submenu{display:none}
+  .gnav li.is-dismissed .chev{transform:none}
+}
 @media (max-width:1100px){
   .gnav>li>a,.gnav>li>button{padding:0 var(--sp-3);font-size:15px}
   .hero__copy{grid-column:1 / span 6}
@@ -343,6 +348,14 @@ figcaption{font-size:var(--fs-small);color:var(--c-steel-700);margin-top:var(--s
   .gnav .nav-cta{padding:var(--sp-5) 0 0;border-bottom:0}
   .gnav .nav-cta a{width:100%;justify-content:center;height:56px}
   body.menu-open{overflow:hidden}
+  /* JS가 없거나 실패하면(html.js 없음) 동작하지 않는 메뉴 버튼 대신 모든 메뉴를 펼친 목록으로 보여 준다 */
+  html:not(.js) .site-header{position:static}
+  html:not(.js) .site-header .container{flex-wrap:wrap;height:auto}
+  html:not(.js) .logo{height:var(--header-h);display:flex;align-items:center}
+  html:not(.js) .site-header nav{flex-basis:100%}
+  html:not(.js) .menu-toggle,html:not(.js) .gnav [data-submenu-toggle]{display:none}
+  html:not(.js) .gnav{display:flex;position:static;height:auto;overflow:visible;padding:0 0 var(--sp-4)}
+  html:not(.js) .gnav .submenu{display:block}
   .hero .grid{display:block}
   .hero__copy{padding-block:var(--sp-7)}
   .hero__media{margin:0 calc(var(--page-pad) * -1)}

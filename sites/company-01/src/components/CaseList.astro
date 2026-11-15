@@ -8,7 +8,8 @@ import cases from '../data/cases.json';
 const groups = Object.entries(cases.filters) as [string, { label: string; values: string[] }][];
 const total = cases.items.length;
 ---
-<section class="section" data-component="CaseList"><div class="container">
+<section class="section" data-component="CaseList" aria-labelledby="case-list-title"><div class="container">
+  <h2 class="sr-only" id="case-list-title">사례 목록</h2>
   <div class="filter" data-component="CaseFilter" data-case-filter hidden>
     {groups.map(([key, g]) => (
       <div class="filter__row" role="group" aria-label={`${g.label} 필터`}>
