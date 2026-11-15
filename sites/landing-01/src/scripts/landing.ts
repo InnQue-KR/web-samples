@@ -19,15 +19,18 @@ if (document.documentElement.classList.contains('motion') && 'IntersectionObserv
   revealTargets.forEach((el) => el.classList.add('is-in'));
 }
 
-/* 2) 상담 신청 구역이 보이면 하단 고정 버튼을 접는다. 접힌 동안 키보드 초점도 받지 않게 inert. */
+/* 2) 상담 신청 구역 위쪽이 화면에 들어온 뒤로는(구역 안·그 아래 바닥글 포함) 하단 고정 버튼을 접는다.
+ *    구역 위쪽이 다시 화면 아래로 내려가면 보인다. 보이는 비율이 아니라 위치로 판단해서 구역이 아무리 길어도 맞다.
+ *    접힌 동안 키보드 초점도 받지 않게 inert. 창 크기가 바뀌어도 관찰자가 다시 알려 준다. */
 const sticky = document.getElementById('sticky-cta');
 const apply = document.getElementById('apply');
 if (sticky && apply && 'IntersectionObserver' in window) {
-  new IntersectionObserver((entries) => {
-    const hide = entries[0]?.isIntersecting ?? false;
+  new IntersectionObserver(([e]) => {
+    if (!e) return;
+    const hide = e.isIntersecting || e.boundingClientRect.top < 0;
     sticky.classList.toggle('is-hidden', hide);
     sticky.inert = hide;
-  }, { threshold: 0.15 }).observe(apply);
+  }).observe(apply);
 }
 
 /* 3) 전화·개인정보처리방침: 연결하지 않고 안내만 */
@@ -77,18 +80,24 @@ if (form) {
     return problems;
   };
 
+  /* 요약 상자: 0개면 비우고 숨김. role=alert라 입력 중에는 글자가 실제로 바뀔 때만 다시 써서 같은 내용을 거듭 읽지 않게 하고,
+   * 제출 때(force)는 같은 내용이어도 다시 써서 다시 알린다. */
+  const showSummary = (problems: { msg: string }[], force = false) => {
+    const text = problems.length ? `확인이 필요한 항목이 ${problems.length}개 있습니다. ${problems.map((p) => p.msg).join(' / ')}` : '';
+    if (force || summary.textContent !== text) summary.textContent = text;
+    summary.classList.toggle('is-visible', problems.length > 0);
+  };
+
   const clearErrors = () => {
     [[nameInput, 'f-name-err'], [phoneInput, 'f-phone-err'], [consent, 'f-consent-err']].forEach(([el, id]) => setError(el as HTMLInputElement, id as string, ''));
-    summary.textContent = '';
-    summary.classList.remove('is-visible');
+    showSummary([]);
   };
 
   armSampleForm(form, {
     validate: () => {
       const problems = check();
+      showSummary(problems, true);
       if (!problems.length) return true;
-      summary.textContent = `확인이 필요한 항목이 ${problems.length}개 있습니다. ${problems.map((p) => p.msg).join(' / ')}`;
-      summary.classList.add('is-visible');
       problems[0]!.el.focus();
       return false;
     },
@@ -100,10 +109,12 @@ if (form) {
     },
   });
 
-  /* 오류가 난 칸은 고치는 즉시 다시 검사 */
+  /* 오류가 난 칸은 고치는 즉시 다시 검사하고, 요약이 떠 있으면 개수·문구도 함께 맞춘다. 초점은 옮기지 않는다. */
   (['input', 'change'] as const).forEach((type) => {
     form.addEventListener(type, (e) => {
-      if ((e.target as Element).closest('.field, .consent')?.classList.contains('has-error')) check();
+      if (!(e.target as Element).closest('.field, .consent')?.classList.contains('has-error')) return;
+      const problems = check();
+      if (summary.classList.contains('is-visible')) showSummary(problems);
     });
   });
 

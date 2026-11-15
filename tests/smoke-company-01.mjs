@@ -51,12 +51,13 @@ try {
     const ext = requests.filter((r) => !r.url.startsWith(ORIGIN));
     const outside = requests.filter((r) => r.url.startsWith(ORIGIN) && !new URL(r.url).pathname.startsWith('/company-01/'));
     const bad = responses.filter((r) => r.status >= 400);
-    const strip = await page.$eval('[data-sample-strip]', (e) => ({ t: e.textContent, y: e.getBoundingClientRect().top }));
+    const strip = await page.$eval('[data-sample-strip]', (e) => ({ t: e.textContent, y: e.getBoundingClientRect().top, tag: e.tagName, label: e.getAttribute('aria-label') }));
     const info = await page.evaluate(() => ({
       robots: document.querySelector('meta[name=robots]')?.getAttribute('content'),
       title: document.title,
       desc: document.querySelector('meta[name=description]')?.getAttribute('content') ?? '',
       og: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? '',
+      ogUrl: document.querySelector('meta[property="og:url"]')?.getAttribute('content') ?? null,
       h1: document.querySelectorAll('h1').length,
       foot: document.querySelector('.disclosure')?.textContent ?? '',
       frame: document.body.dataset.frame,
@@ -65,10 +66,12 @@ try {
     }));
     const ok = res.status() === 200 && ext.length === 0 && outside.length === 0 && bad.length === 0
       && info.robots === 'noindex, nofollow' && strip.y === 0 && strip.t.includes('샘플 사이트') && info.foot.includes('AI를 활용')
-      && info.h1 === 1 && info.desc && info.og.startsWith('/company-01/') && info.brokenImg.length === 0 && info.extLinks.length === 0
+      && info.h1 === 1 && info.desc && info.og === 'https://samples.innque.co.kr/company-01/images/og-image.png' && info.brokenImg.length === 0 && info.extLinks.length === 0
       && !consoleMsgs.some((m) => /^(error|pageerror)/.test(m));
     check(`${tag} 200·외부요청0·/company-01/ 밖 0·noindex·샘플 띠 y=0·AI 고지·h1 1개·description·OG·외부/tel/mailto 링크 0·콘솔 오류 0`, ok,
       `${res.status()} [${info.frame}] "${info.title}" ext=${ext.length} out=${outside.length} bad=${bad.map((b) => b.url).join(',')} h1=${info.h1} img깨짐=${info.brokenImg.join(',')} console=${consoleMsgs.join('|')}`);
+    const wantUrl = path === '404.html' ? null : `https://samples.innque.co.kr/company-01/${path}`;
+    check(`${tag} og:url ${wantUrl ?? '없음(404는 여러 주소에서 보이므로)'}·샘플 띠 aside 랜드마크`, info.ogUrl === wantUrl && strip.tag === 'ASIDE' && Boolean(strip.label), `og:url=${info.ogUrl} strip=${strip.tag}/${strip.label}`);
     const broken = await loadAllImages(page);
     check(`${tag} 지연 로딩 포함 모든 이미지 열림`, broken.length === 0, broken.join(','));
     if (path !== '404.html') { check(`${tag} title 중복 없음`, !titles.has(info.title)); titles.add(info.title); }

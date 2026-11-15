@@ -46,8 +46,11 @@ try {
     const ids = await page.$$eval('main > section', (s) => s.map((x) => x.id));
     check('8개 구역 순서', JSON.stringify(ids) === JSON.stringify(['top', 'method', 'classes', 'teachers', 'process', 'faq', 'location', 'apply']), ids.join(','));
     check('noindex,nofollow', (await page.getAttribute('meta[name=robots]', 'content')) === 'noindex, nofollow');
-    const strip = await page.$eval('[data-sample-strip]', (e) => ({ t: e.textContent, y: e.getBoundingClientRect().top }));
+    const strip = await page.$eval('[data-sample-strip]', (e) => ({ t: e.textContent, y: e.getBoundingClientRect().top, tag: e.tagName, label: e.getAttribute('aria-label') }));
     check('샘플 띠가 맨 위(y=0)', strip.y === 0 && strip.t.includes('샘플 사이트'), JSON.stringify(strip));
+    check('샘플 띠는 이름 붙은 랜드마크(aside)', strip.tag === 'ASIDE' && Boolean(strip.label), JSON.stringify(strip));
+    const og = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('meta[property^="og:"]')].map((m) => [m.getAttribute('property'), m.getAttribute('content')])));
+    check('OG 이미지·URL은 예정 공개 주소 기준 전체 주소', og['og:image'] === 'https://samples.innque.co.kr/landing-01/images/og-image.png' && og['og:url'] === 'https://samples.innque.co.kr/landing-01/', `${og['og:image']} ${og['og:url']}`);
     check('바닥글 AI·가상 고지', (await page.textContent('.site-footer__notice')).includes('AI를 활용'));
     await page.evaluate(() => document.fonts.ready);
     const font = await page.evaluate(() => ({ check: document.fonts.check('800 16px "Pretendard Variable"', '셈틈 막힌 곳'), family: getComputedStyle(document.body).fontFamily }));
@@ -113,14 +116,40 @@ try {
     await context.close();
   }
 
-  // ---------- 4. 하단 고정 버튼 접힘 ----------
+  // ---------- 4. 하단 고정 버튼 접힘 (360×740, UX-01: 상담 구역을 지나 바닥글까지 접힌 채, 위로 돌아가면 다시 보임) ----------
   {
     const { context, page } = await open();
-    check('처음엔 하단 버튼 보임', !(await page.$eval('#sticky-cta', (e) => e.classList.contains('is-hidden'))));
-    await page.$eval('#apply', (e) => e.scrollIntoView());
-    await page.waitForTimeout(800);
-    const st = await page.$eval('#sticky-cta', (e) => ({ hidden: e.classList.contains('is-hidden'), inert: e.inert }));
-    check('상담 구역에서 하단 버튼 접힘·inert', st.hidden && st.inert, JSON.stringify(st));
+    const st = () => page.$eval('#sticky-cta', (e) => ({ hidden: e.classList.contains('is-hidden'), inert: e.inert }));
+    const scrollTo = async (fn) => { await page.evaluate(fn); await page.waitForTimeout(400); };
+    const applyTop = () => page.$eval('#apply', (e) => Math.round(e.getBoundingClientRect().top));
+    check('처음엔 하단 버튼 보임', !(await st()).hidden && !(await st()).inert);
+    await scrollTo(() => document.getElementById('apply').scrollIntoView());
+    let s = await st();
+    check('상담 구역에서 하단 버튼 접힘·inert', s.hidden && s.inert, JSON.stringify(s));
+    await scrollTo(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    s = await st();
+    const foot = await page.$eval('.site-footer', (e) => Math.round(e.getBoundingClientRect().top));
+    check('페이지 끝(바닥글)에서도 접힘·inert 유지', s.hidden && s.inert && foot < 740, `${JSON.stringify(s)} footerTop=${foot} applyTop=${await applyTop()}`);
+    await page.setViewportSize({ width: 360, height: 500 });
+    await page.waitForTimeout(400);
+    s = await st();
+    check('페이지 끝에서 창 높이 바꿔도(360×500) 접힘 유지', s.hidden && s.inert, JSON.stringify(s));
+    await page.setViewportSize({ width: 360, height: 740 });
+    await scrollTo(() => { const a = document.getElementById('apply'); window.scrollTo(0, a.getBoundingClientRect().top + window.scrollY - window.innerHeight - 200); });
+    s = await st();
+    check('상담 구역 위로 돌아가면 다시 보임·inert 해제', !s.hidden && !s.inert, `${JSON.stringify(s)} applyTop=${await applyTop()}`);
+    // 긴 폼: 상담 구역이 화면 높이의 6배 이상이어도 구역 한가운데에서 접힘(보이는 비율만 보는 조건은 실패)
+    await page.$eval('#apply', (e) => { e.style.paddingBottom = '5000px'; });
+    await scrollTo(() => { const a = document.getElementById('apply'); window.scrollTo(0, a.getBoundingClientRect().top + window.scrollY + a.offsetHeight / 2); });
+    s = await st();
+    check('긴 상담 구역 중간에서도 접힘·inert', s.hidden && s.inert, `${JSON.stringify(s)} applyH=${await page.$eval('#apply', (e) => e.offsetHeight)}`);
+    await page.$eval('#apply', (e) => { e.style.paddingBottom = ''; });
+    await scrollTo(() => window.scrollTo(0, 0));
+    s = await st();
+    check('맨 위로 돌아가면 다시 보임', !s.hidden && !s.inert, JSON.stringify(s));
+    await page.screenshot({ path: `${OUT}sticky-top-360.png` });
+    await scrollTo(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.screenshot({ path: `${OUT}sticky-bottom-360.png` });
     await context.close();
   }
 
@@ -211,6 +240,61 @@ try {
     await submit();
     check('재시도: 다시 샘플 안내', await page.isVisible('#form-done.is-visible'));
     await page.screenshot({ path: `${OUT}form-done-1280.png` });
+    await context.close();
+  }
+
+  // ---------- 6-1. 오류 요약 갱신 (UX-02: 고치는 즉시 개수·문구 갱신, 0개면 숨김, 입력 중 초점 유지) ----------
+  {
+    const { context, page } = await open({ viewport: { width: 1280, height: 900 } });
+    const submit = () => page.click('#apply-form button[type=submit]');
+    // 요약이 보이면 "N개"와 오류 칸 수가 같아야 하고, 오류가 0개면 요약은 숨김·빈 글자
+    const state = () => page.evaluate(() => {
+      const s = document.getElementById('form-summary');
+      const errs = [...document.querySelectorAll('#apply-form .has-error')].length;
+      return { visible: s.classList.contains('is-visible') && s.getBoundingClientRect().height > 0, n: Number(s.textContent.match(/(\d+)개/)?.[1] ?? 0), text: s.textContent, errs, focus: document.activeElement?.id };
+    });
+    const consistent = (s) => (s.errs === 0 ? !s.visible && s.text === '' : s.visible && s.n === s.errs);
+    await submit();
+    let s = await state();
+    check('UX-02 빈 제출: 요약 2개 = 오류 칸 2개', s.n === 2 && consistent(s), JSON.stringify(s));
+    // 연락처를 키보드로 입력: 요약 바뀜 횟수(낭독기 재알림)를 함께 센다
+    await page.evaluate(() => { window.__sumMut = 0; new MutationObserver(() => { window.__sumMut++; }).observe(document.getElementById('form-summary'), { childList: true, characterData: true, subtree: true }); });
+    await page.focus('#f-phone');
+    await page.keyboard.type('010');
+    s = await state();
+    const muts = await page.evaluate(() => window.__sumMut);
+    check('UX-02 입력 중: 형식 오류로 문구 갱신, 개수 일치, 초점은 연락처 그대로', s.n === 2 && consistent(s) && s.text.includes('형식') && s.focus === 'f-phone', JSON.stringify(s));
+    check('UX-02 입력 중: 요약은 내용이 바뀔 때만 다시 씀(3타 중 1회)', muts === 1, `mutations=${muts}`);
+    await page.keyboard.type('-1234-5678');
+    s = await state();
+    check('UX-02 연락처 고침: 요약 1개(동의만), 초점 그대로', s.n === 1 && consistent(s) && !s.text.includes('연락처') && s.focus === 'f-phone', JSON.stringify(s));
+    await page.focus('#f-consent');
+    await page.keyboard.press('Space');
+    s = await state();
+    check('UX-02 모두 고침: 요약 숨김·빈 글자, 초점 그대로(동의)', s.errs === 0 && consistent(s) && s.focus === 'f-consent', JSON.stringify(s));
+    // 재시도: 동의를 다시 풀고 제출 → 1개로 다시 표시, 첫 오류로 초점
+    await page.keyboard.press('Space');
+    s = await state();
+    check('UX-02 오류 없던 칸을 다시 바꿔도 요약은 제출 전까지 숨김', !s.visible && s.errs === 0, JSON.stringify(s));
+    await submit();
+    s = await state();
+    check('UX-02 재제출: 요약 1개·동의로 초점', s.n === 1 && consistent(s) && s.focus === 'f-consent', JSON.stringify(s));
+    await page.evaluate(() => { window.__sumMut = 0; });
+    await submit();
+    check('UX-02 같은 오류로 다시 제출해도 요약을 다시 써서 다시 알림', (await page.evaluate(() => window.__sumMut)) >= 1 && (await state()).n === 1, `mutations=${await page.evaluate(() => window.__sumMut)}`);
+    // 새 오류: 성함만 넣고(이름 동의 없음) 필수 동의를 고치면 → 이름 오류가 새로 잡혀 1개 유지
+    await page.fill('#f-name', TEST_NAME);
+    await page.check('#f-consent');
+    s = await state();
+    check('UX-02 새 오류(이름 동의 없음): 요약이 새 오류로 바뀌고 개수 일치', s.n === 1 && consistent(s) && s.text.includes('이름 동의'), JSON.stringify(s));
+    await page.check('#f-name-consent');
+    s = await state();
+    check('UX-02 이름 동의 체크: 요약 숨김', s.errs === 0 && consistent(s), JSON.stringify(s));
+    await submit();
+    check('UX-02 모두 고친 뒤 제출: 샘플 안내', await page.isVisible('#form-done.is-visible'));
+    await page.click('#form-reset');
+    s = await state();
+    check('UX-02 초기화 뒤 요약 없음', s.errs === 0 && consistent(s), JSON.stringify(s));
     await context.close();
   }
 

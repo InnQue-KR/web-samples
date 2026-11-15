@@ -1,8 +1,10 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { SAMPLE_ORIGIN } from '@web-samples/sample-kit/origin';
 
-// 공개 주소(도메인)는 아직 정해지지 않았다. site를 넣지 않고 하위 경로만 고정한다.
+// site는 공유 미리보기(og:image·og:url) 전체 주소용 **예정** origin이다. 넣었다고 공개된 것이 아니다(배포는 대표 승인 뒤).
 export default defineConfig({
+  site: SAMPLE_ORIGIN,
   base: '/landing-01/',
   trailingSlash: 'always',
   build: { format: 'directory' },

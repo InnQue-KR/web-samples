@@ -28,10 +28,10 @@ const page = (title, body) => `<!doctype html>
 <style>body{margin:0;font-family:system-ui,sans-serif;line-height:1.6;color:#222;background:#fff}.top-strip{background:#222;color:#fff;text-align:center;padding:.5rem 1rem;font-size:.875rem}main{max-width:40rem;margin:0 auto;padding:2rem 1.25rem}a{color:inherit}li{margin:.5rem 0}</style>
 </head>
 <body>
-<div class="top-strip" data-sample-strip>샘플 사이트 · 실제 업체가 아닙니다</div>
+<aside class="top-strip" aria-label="샘플 안내" data-sample-strip>샘플 사이트 · 실제 업체가 아닙니다</aside>
 <main>
 ${body}
-<p><small>여기 있는 사이트는 모두 포트폴리오용으로 만든 가상 샘플입니다. 상호·주소·연락처·인물·가격은 실제가 아닙니다. 제작에 AI를 활용했고 사람이 검토했습니다.</small></p>
+<p><small>여기 있는 사이트는 모두 포트폴리오용으로 만든 가상 샘플입니다. 상호·주소·연락처·인물·가격은 실제가 아닙니다. 기획·문구·이미지 제작에 AI를 활용했습니다.</small></p>
 </main>
 </body>
 </html>

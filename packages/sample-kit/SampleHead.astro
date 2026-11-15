@@ -3,6 +3,8 @@
  * 샘플 공통 <head>. robots는 props로 바꿀 수 없다(모든 샘플 HTML은 noindex, nofollow).
  * 외부 CDN·분석 태그를 넣지 않는다. 사이트별 글꼴·스타일은 slot으로 받는다.
  * 경로 값(favicon, ogImage)은 base를 뺀 상대 경로로 받고 여기서 base를 붙인다.
+ * og:image·og:url은 astro.config의 site(예정 origin, sample-kit/origin.mjs)로 전체 주소를 만든다(Open Graph 규격).
+ * 404는 여러 주소에서 같은 파일이 보이므로 og:url을 두지 않는다.
  */
 interface Props {
   title: string;
@@ -18,6 +20,9 @@ interface Props {
 const { title, description, siteName, favicon, themeColor, ogImage, ogImageWidth, ogImageHeight, ogImageAlt } = Astro.props;
 const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
 const asset = (p: string) => `${base}${p.replace(/^\/+/, '')}`;
+if (!Astro.site) throw new Error('astro.config.mjs에 site(예정 origin)가 없습니다. og:image/og:url을 전체 주소로 만들 수 없습니다.');
+const absolute = (path: string) => new URL(path, Astro.site).href;
+const is404 = /\/404(\.html|\/)?$/.test(Astro.url.pathname);
 ---
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,7 +35,8 @@ const asset = (p: string) => `${base}${p.replace(/^\/+/, '')}`;
 <meta property="og:site_name" content={siteName} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-{ogImage && <meta property="og:image" content={asset(ogImage)} />}
+{!is404 && <meta property="og:url" content={absolute(Astro.url.pathname)} />}
+{ogImage && <meta property="og:image" content={absolute(asset(ogImage))} />}
 {ogImage && ogImageWidth && <meta property="og:image:width" content={String(ogImageWidth)} />}
 {ogImage && ogImageHeight && <meta property="og:image:height" content={String(ogImageHeight)} />}
 {ogImage && ogImageAlt && <meta property="og:image:alt" content={ogImageAlt} />}

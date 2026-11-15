@@ -1,5 +1,6 @@
 // 조립된 dist/를 브라우저 없이 검사한다. 실패하면 종료 코드 1.
-//  - 모든 HTML: noindex,nofollow / 샘플 띠 / 외부 주소·tel:·mailto: 없음
+//  - 모든 HTML: noindex,nofollow / 샘플 띠(aside 랜드마크) / AI 고지('사람이 검토' 문구 없음) / 외부 주소·tel:·mailto: 없음
+//  - OG: og:image·og:url은 예정 origin(sample-kit/origin.mjs)+자기 경로의 전체 주소. 404에는 og:url 없음
 //  - 내부 경로(/, ./, url())가 실제 파일로 풀림, 샘플 페이지의 경로는 /<id>/ 아래
 //  - 번들 JS: 네트워크 전송·브라우저 저장소·쿠키·콘솔 코드 없음
 //  - landing-01: data-track 정확히 3종, 폼 잠금(fieldset disabled)과 개인정보 칸 name 없음
@@ -7,6 +8,7 @@
 //  - Pretendard dynamic-subset 범위 밖 글자(글꼴 누락) 목록, 페이지별 예상 전송량
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
+import { SAMPLE_ORIGIN } from '../packages/sample-kit/origin.mjs';
 
 const root = new URL('..', import.meta.url).pathname;
 const dist = join(root, 'dist');
@@ -30,12 +32,29 @@ const resolveUrl = (fromFile, url) => {
 };
 const ALLOWED_ABSOLUTE = /^http:\/\/www\.w3\.org\//; // SVG 네임스페이스
 
+// og:image·og:url만 예정 origin의 전체 주소를 쓴다. 검사한 뒤 아래 외부 주소 검사에서는 이 두 태그를 뺀다.
+const OG_TAG = /<meta property="og:(image|url)" content="([^"]*)"\s*\/?>/g;
+const checkOg = (f, html, id) => {
+  const og = Object.fromEntries([...html.matchAll(OG_TAG)].map((m) => [m[1], m[2]]));
+  const is404 = rel(f).endsWith('/404.html');
+  if (!og.image?.startsWith(`${SAMPLE_ORIGIN}/${id}/`)) fail(`${rel(f)}: og:image가 ${SAMPLE_ORIGIN}/${id}/ 기준 전체 주소가 아님 (${og.image ?? '없음'})`);
+  else if (!existsSync(join(dist, og.image.slice(SAMPLE_ORIGIN.length)))) fail(`${rel(f)}: og:image 파일 없음 ${og.image}`);
+  const want = is404 ? undefined : SAMPLE_ORIGIN + rel(f).replace(/index\.html$/, '');
+  if (og.url !== want) fail(`${rel(f)}: og:url ${og.url ?? '없음'} (기대 ${want ?? '없음(404)'})`);
+  report.og ??= {};
+  report.og[rel(f)] = og;
+};
+
 for (const f of files.filter((x) => x.endsWith('.html'))) {
-  const html = readFileSync(f, 'utf8');
+  const raw = readFileSync(f, 'utf8');
   const id = sampleOf(f);
+  if (id) checkOg(f, raw, id);
+  else if (/property="og:/.test(raw)) fail(`${rel(f)}: 루트 조립 화면에 OG 태그 있음(예상 밖)`);
+  const html = raw.replace(OG_TAG, '');
   if (!/<meta name="robots" content="noindex, nofollow"\s*\/?>/.test(html)) fail(`${rel(f)}: noindex,nofollow 없음`);
-  if (!html.includes('data-sample-strip')) fail(`${rel(f)}: 샘플 띠 없음`);
+  if (!/<aside\b[^>]*aria-label="[^"]+"[^>]*data-sample-strip|<aside\b[^>]*data-sample-strip[^>]*aria-label="[^"]+"/.test(html)) fail(`${rel(f)}: 샘플 띠가 이름 붙은 aside 랜드마크가 아님`);
   if (!/AI를 활용/.test(html)) fail(`${rel(f)}: AI 활용 고지 없음`);
+  if (/사람이 검토/.test(html)) fail(`${rel(f)}: 확인되지 않은 '사람이 검토' 문구`);
   if (/(href|src|action)\s*=\s*["']?(tel:|mailto:|sms:)/i.test(html)) fail(`${rel(f)}: tel/mailto 링크 있음`);
   if (/innque\.co\.kr|github\.com\/InnQue|instagram|facebook\.com|blog\.naver/i.test(html)) fail(`${rel(f)}: InnQue/SNS 링크 의심`);
   if (/googletagmanager|google-analytics|gtag\(|fbq\(/i.test(html)) fail(`${rel(f)}: 분석 태그 있음`);
@@ -101,7 +120,7 @@ if (existsSync(company)) {
     if (!t || titles.has(t)) fail(`company-01/${p}: title 없음 또는 중복`);
     titles.add(t);
     if (!/<meta name="description" content="[^"]+"/.test(html)) fail(`company-01/${p}: description 없음`);
-    if (!/<meta property="og:title"/.test(html) || !/<meta property="og:image" content="\/company-01\//.test(html)) fail(`company-01/${p}: OG 없음`);
+    if (!/<meta property="og:title"/.test(html) || !html.includes(`<meta property="og:image" content="${SAMPLE_ORIGIN}/company-01/`)) fail(`company-01/${p}: OG 없음`);
     if (/data-sample-notice="[^"]*상세/.test(html)) fail(`company-01/${p}: 상세 대신 안내창으로 남은 공지 링크`);
   }
   const quote = readFileSync(join(company, 'quote/index.html'), 'utf8');

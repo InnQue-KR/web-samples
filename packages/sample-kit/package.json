@@ -8,7 +8,8 @@
     "./SampleHead.astro": "./SampleHead.astro",
     "./SampleStrip.astro": "./SampleStrip.astro",
     "./sample-notice": "./sample-notice.ts",
-    "./sample-form": "./sample-form.ts"
+    "./sample-form": "./sample-form.ts",
+    "./origin": "./origin.mjs"
   },
   "bin": {
     "copy-pretendard": "./scripts/copy-pretendard.mjs"
