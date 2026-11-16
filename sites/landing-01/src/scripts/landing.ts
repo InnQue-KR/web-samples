@@ -23,7 +23,7 @@ if (document.documentElement.classList.contains('motion') && 'IntersectionObserv
  *    구역 위쪽이 다시 화면 아래로 내려가면 보인다. 보이는 비율이 아니라 위치로 판단해서 구역이 아무리 길어도 맞다.
  *    접힌 동안 키보드 초점도 받지 않게 inert.
  *    관찰자는 구역이 화면 밖→밖으로 한 번에 건너뛰면(바닥글 로고·FAQ 링크 등) 알려 주지 않으므로,
- *    스크롤·창 크기·페이지 복귀 때마다 현재 위치를 다시 재되 한 프레임에 한 번만 잰다. */
+ *    스크롤·창 크기 때마다 현재 위치를 다시 재되 한 프레임에 한 번만 재고, 페이지 복귀(pageshow) 때는 바로 잰다. */
 const sticky = document.getElementById('sticky-cta');
 const apply = document.getElementById('apply');
 if (sticky && apply) {
@@ -38,7 +38,8 @@ if (sticky && apply) {
   const opts = { passive: true };
   addEventListener('scroll', queue, opts);
   addEventListener('resize', queue, opts);
-  addEventListener('pageshow', queue);
+  // 뒤로 가기 복원 직후엔 다음 프레임이 늦을 수 있어(WebKit) 위치가 정해진 pageshow에서 바로 잰다.
+  addEventListener('pageshow', sync);
   // 스크롤 없이 위쪽 내용 높이만 바뀌어 구역이 움직이는 경우는 관찰자가 맡는다.
   if ('IntersectionObserver' in window) new IntersectionObserver(queue).observe(apply);
   sync();
