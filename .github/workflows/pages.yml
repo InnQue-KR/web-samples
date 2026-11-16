@@ -1,0 +1,68 @@
+# 가상 샘플 GitHub Pages 배포. 대표 승인 뒤 사람이 수동으로만 실행한다(push·PR로는 실행되지 않음).
+# 실행: gh workflow run pages.yml -R InnQue-KR/web-samples --ref main -f expected_sha=<승인된 commit 40자>
+# 순서: 승인 commit 확인 → npm ci → build → check(실패 시 중단) → QA 배포본 manifest gate → 업로드 → 올린 파일 재확인 → 배포
+# 액션은 공식 저장소 최신 릴리스(2026-11-16 확인)를 commit SHA로 고정했다.
+name: pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: 대표가 승인한 commit SHA(40자). 실행 ref의 HEAD와 다르면 중단
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: 승인 commit·실행 ref 확인
+        env:
+          EXPECTED: ${{ inputs.expected_sha }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/main || { echo "main에서만 실행: $GITHUB_REF"; exit 1; }
+          test "$GITHUB_SHA" = "$EXPECTED" || { echo "승인 commit($EXPECTED)과 실행 commit($GITHUB_SHA)이 다름"; exit 1; }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc # 24.22.3
+          package-manager-cache: false
+      - run: npm ci
+      - run: npm run build
+      - run: npm run check # noindex·미전송 폼·외부 주소·글꼴 범위(새 글자 누락) 등. 실패하면 이후 단계 전부 미실행
+      - name: 출고 gate(QA 배포본과 전체 경로·바이트 비교)
+        run: node scripts/verify-dist-manifest.mjs dist
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+          include-hidden-files: true # .nojekyll까지 manifest와 같은 247개
+      - name: 업로드한 artifact 재확인
+        run: |
+          mkdir "$RUNNER_TEMP/uploaded"
+          tar -xf "$RUNNER_TEMP/artifact.tar" -C "$RUNNER_TEMP/uploaded"
+          node scripts/verify-dist-manifest.mjs "$RUNNER_TEMP/uploaded"
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
