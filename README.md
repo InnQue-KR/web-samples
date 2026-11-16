@@ -15,7 +15,8 @@ InnQue 포트폴리오용 **가상** 샘플 사이트 모음입니다. 모든 �
 | npm | 11.19.1 | `packageManager` |
 | Astro | 7.4.12 | 2026-11-15 npm 최신 안정판, exact 고정 |
 | TypeScript / @astrojs/check | 6.0.3 / 0.9.12 | @astrojs/check가 TS 7을 아직 지원하지 않아 6.x |
-| Pretendard | 1.3.9 | 공식 npm 패키지의 가변 dynamic-subset을 변경 없이 복사 |
+| Pretendard | 1.3.9 | 공식 npm 패키지의 가변 dynamic-subset을 변경 없이 복사. company-01은 화면 글자만 담은 파생본 Doram Sans(아래)를 먼저 쓰고 공식 파일은 범위 밖 글자용 |
+| fontTools / brotli (company-01 글꼴 재생성 전용) | 4.68.0 / 1.2.1 | `sites/company-01/scripts/font-requirements.txt`(PyPI 해시 고정). 빌드·검사에는 필요 없음 |
 | IBM Plex Mono (company-01) | 1.1.0 | 공식 Latin1 woff2 2개를 변경 없이 저장소에 둠(npm 패키지는 설치 때 원격 측정을 실행해 의존성으로 넣지 않음) |
 | Playwright(검사용) | 1.65.1 | Chromium headless shell |
 
@@ -26,11 +27,11 @@ InnQue 포트폴리오용 **가상** 샘플 사이트 모음입니다. 모든 �
 ```bash
 npm ci                 # lockfile 그대로 설치
 npm run build          # 각 사이트 빌드(+ Pretendard 복사) → dist/<sample-id>/ 로 조립, dist/index.html·404.html·.nojekyll 생성
-npm run check          # astro check(타입) + dist 정적 검사(noindex·샘플 띠 랜드마크·OG 전체 주소·외부 주소·경로·폼 잠금·data-track·글꼴 범위·전송량, company-01 URL 10개·OG)
+npm run check          # astro check(타입) + dist 정적 검사(noindex·샘플 띠 랜드마크·OG 전체 주소·외부 주소·경로·폼 잠금·data-track·글꼴 범위·전송량, company-01 URL 10개·OG·파생 글꼴 해시·글자 범위)
 npx playwright install chromium   # smoke 처음 한 번
 npm run smoke          # 두 사이트 브라우저 smoke → qa-output/<sample-id>/smoke.json, PNG
 npm run smoke:landing-01   # 랜딩만(95개 항목)
-npm run smoke:company-01   # 기업만(166개 항목)
+npm run smoke:company-01   # 기업만(185개 항목)
 npm run preview        # http://127.0.0.1:4321/landing-01/ · /company-01/ (dist를 GitHub Pages처럼 제공, 없는 경로는 루트 404)
 npm run zip            # out/ 에 소스 ZIP·배포 ZIP과 SHA-256
 ```

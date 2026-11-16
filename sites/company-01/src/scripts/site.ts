@@ -46,8 +46,9 @@ if (header && toggle) {
   });
   groups.forEach((li) => {
     btnOf(li).addEventListener('click', () => {
-      // 지금 보이면 닫고(데스크톱은 hover·초점이 남아 있어도 숨김), 안 보이면 연다
-      const open = !shown(li);
+      // 명시 상태(is-open)로만 토글한다. hover·초점으로 보이던 것은 아직 '열기 전'으로 본다:
+      // 첫 클릭·탭·Enter는 늘 열고(R-1), 눌러 연 메뉴를 다시 누르면 hover·초점이 남아 있어도 숨긴다
+      const open = !li.classList.contains('is-open');
       li.classList.toggle('is-open', open);
       dismiss(li, !open && !mobile.matches);
       sync();
@@ -59,9 +60,19 @@ if (header && toggle) {
       // 초점이 그룹 밖으로 나가면 데스크톱에서는 눌러 연 상태도 닫는다(다른 메뉴 위에 겹쳐 남지 않게)
       if (!mobile.matches) li.classList.remove('is-open');
       if (!li.matches(':hover')) dismiss(li, false);
+      sync(); // 대부분 엔진은 focusout 때 :focus-within이 이미 풀려 있다. 아닌 엔진을 위해 다음 차례에 한 번 더
       setTimeout(sync);
     });
-    li.addEventListener('focusin', () => setTimeout(sync));
+    // focusin 때는 :focus-within이 이미 적용돼 있어 바로 맞춘다. 터치 뒤 남아 있던 :hover가 옮겨 갈 때(mouseleave)도 바로 맞춘다
+    li.addEventListener('focusin', sync);
+    li.addEventListener('mouseleave', sync);
+  });
+  // 데스크톱: 메뉴 밖을 누르면 눌러 연 하위 메뉴를 닫는다(버튼에 초점이 가지 않는 터치 브라우저에서도 focusout 없이 닫히게)
+  document.addEventListener('pointerdown', (e) => {
+    if (mobile.matches) return;
+    const hit = groups.filter((li) => li.classList.contains('is-open') && !li.contains(e.target as Node));
+    hit.forEach((li) => li.classList.remove('is-open'));
+    if (hit.length) sync();
   });
   // 링크를 누르면 펼침 메뉴를 닫는다. 같은 페이지 앵커면 그 구역으로 초점을 옮겨 키보드 위치도 따라가게 한다
   $$<HTMLAnchorElement>('.gnav a').forEach((a) => a.addEventListener('click', () => {

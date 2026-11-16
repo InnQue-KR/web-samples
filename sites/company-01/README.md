@@ -38,8 +38,10 @@ src/
   styles/tokens.css, site.css  시안 CSS(값/컴포넌트). 구현에서 더한 규칙은 site.css 끝에 모음
 public/images/   시안 SVG 그대로 + 윤곽선 로고·favicon·OG 이미지
 public/fonts/plex-mono/   IBM Plex Mono 1.1.0 공식 Latin1 woff2 2개(변경 없음) + LICENSE
+public/fonts/doram-sans/  파생 글꼴 Doram Sans(Pretendard 1.3.9 글리프 서브셋, 이름 변경) + manifest.json·LICENSE·FONTLOG. 생성기 산출물, 손으로 고치지 않음
 docs/            assets.csv(자원 목록), licenses/, operations.md(운영 안내)
-scripts/         outline-logo.mjs(로고 글자 → 윤곽선, 1회), make-og.mjs(OG 이미지, 1회)
+scripts/         outline-logo.mjs(로고 글자 → 윤곽선, 1회), make-og.mjs(OG 이미지, 1회),
+                 font-chars.mjs·make-font-subset.py·font-requirements.txt(파생 글꼴 생성, 운영 안내 5절)
 ```
 
 ## 명령 (저장소 루트에서)
@@ -54,7 +56,7 @@ npm run preview               # http://127.0.0.1:4321/company-01/
 
 1. **페이지 조립**: 연혁·인증/오시는 길 → 회사 소개, 설비/품질 관리 → 가공 서비스(10 URL 기준). 원래 페이지 제목은 같은 모양의 구역 머리(`PartHead`, h2)로 옮기고 그 안의 구역 제목은 h3로 내려 페이지마다 h1이 하나가 되게 했습니다.
 2. **공지 상세 3건 실제 생성**: 안내창으로 남아 있던 2건(설 연휴, 인증 갱신)의 본문을 작성. 이전/다음 글이 실제로 이동하고 끝 글은 "없습니다"로 표시.
-3. **글꼴**: 시안의 Pretendard 전체 글리프 woff2 3개(약 2.3MB)를 쓰지 않고 공식 가변 dynamic-subset(화면에 쓰인 범위만 받음). IBM Plex Mono는 공식 1.1.0 파일 그대로.
+3. **글꼴**: 시안의 Pretendard 전체 글리프 woff2 3개(약 2.3MB)를 쓰지 않음. INNA-653부터 화면 글자(사이트 HTML·JS·CSS + ASCII + 고정 기호, 500자)만 담은 파생 가변 글꼴 **Doram Sans** 한 파일(약 112KB)을 먼저 쓰고, 범위 밖 글자(입력 칸에 치는 글자)는 공식 가변 dynamic-subset으로 받음(입력 칸에 처음 초점이 갈 때 공식 CSS 연결, JS 꺼짐은 noscript). 페이지당 공식 조각 15~16개·0.36~0.40MB + CSS 55KB → 파생본 1개(약 112KB). 새 콘텐츠의 글자는 `npm run check`가 잡아 재생성(운영 안내 5절). 윤곽선·굵기 축·간격·OpenType 기능은 원본 그대로이고(Chromium에서 원본 전체 글꼴과 픽셀 동일) OFL 예약 이름 때문에 이름만 바꿈. IBM Plex Mono는 공식 1.1.0 파일 그대로.
 4. **로고**: `<text>`(글꼴 의존) → 윤곽선 path. 모양 동일.
 5. **견적 폼 안전장치**: 입력 칸·동의에서 `name` 제거, 전체를 `<fieldset disabled>`로 시작하고 스크립트가 submit 차단을 먼저 붙인 뒤 해제(공통 `sample-form`). JS 꺼짐 안내 추가. 통과 시 입력값·동의 즉시 지움. 글자 수 상한(회사명 50·이름 30·연락처 100·품목 100·요청 1,000). 칸별 `role=alert` 대신 위쪽 요약 한 곳에서 읽게 함.
 6. **동의·방침 문안**: 실제 수집처럼 읽히지 않게 "샘플 시연: 저장·전송하지 않음"을 앞에 두고, 시안 문안은 "실제 납품 문안(예시)"으로 유지. 개인정보처리방침 첫머리에 같은 안내.
@@ -67,6 +69,7 @@ npm run preview               # http://127.0.0.1:4321/company-01/
 13. **제목 단계(INNA-644)**: 사례 목록 앞 "사례 목록", 견적 폼 앞 "견적 문의 입력" 숨김 h2(화면 변화 없음).
 14. **첫 화면 그림(INNA-644)**: 가공 서비스 첫 구역·회사 소개 공장 그림의 지연 로딩·등장 효과를 빼고 홈 그림과 함께 `fetchpriority=high`·`decoding=sync`(모바일 LCP 측정 근거는 INNA-644 measurement).
 15. **인증 갱신 연도(INNA-644)**: 시안끼리 달랐던 연도(카드 2025 vs 공지 2026-09-02)를 최신 공지 기준 2026으로 통일. 가상 값이며 실제 인증을 확인한 것이 아님.
+16. **하위 메뉴 첫 클릭·탭(INNA-653 R-1)**: 1024px 이상 그룹 버튼은 '지금 보이는가'가 아니라 눌러 연 상태(`is-open`)로만 토글. hover·초점으로 보이던 메뉴도 첫 클릭·터치 탭·Enter·Space에 열리고, 다시 누르면 닫힘. 메뉴 밖을 누르면 닫힘. `aria-expanded`는 계속 실제 표시를 따름.
 
 ## 남은 확인(마케팅·기획)
 

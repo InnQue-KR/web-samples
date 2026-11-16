@@ -78,6 +78,11 @@ try {
     const urls = [...new Set(requests.map((r) => r.url))];
     const total = urls.reduce((s, u) => s + bytesOf(u), 0);
     check(`${tag} 첫 로드 파일 합계 ≤ 1.5MB(압축 전, 1280)`, total <= 1.5 * 1024 * 1024, `${urls.length}개 ${(total / 1024).toFixed(0)}KB`);
+    // (INNA-653) 화면 글자는 파생본 Doram Sans 한 파일로. 공식 Pretendard 조각은 범위 밖 글자용이라 받지 않아야 함(같은 글자 중복 없음)
+    const chunks = urls.filter((u) => u.includes('/fonts/pretendard/'));  // 조각 woff2와 대체 경로 CSS 모두(첫 로드에는 받지 않음)
+    const doram = requests.filter((r) => r.url.endsWith('/fonts/doram-sans/DoramSans-subset.woff2'));
+    const fontsOk = await page.evaluate(() => document.fonts.check('16px "Doram Sans"', '가') && [...document.fonts].some((f) => f.family.replace(/"/g, '') === 'Doram Sans' && f.status === 'loaded'));
+    check(`${tag} 글꼴: Doram Sans 1회 받아 사용, 공식 Pretendard CSS·조각 0개`, chunks.length === 0 && doram.length === 1 && fontsOk, `조각 ${chunks.length} doram ${doram.length} loaded=${fontsOk}`);
     await context.close();
   }
 
@@ -86,9 +91,10 @@ try {
     const { context, page, requests } = await open('services/');
     await page.evaluate(() => document.fonts.ready);
     const fams = await page.evaluate(() => [...new Set([...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family.replace(/"/g, '')))]);
-    check('로드된 글꼴은 Pretendard Variable·IBM Plex Mono만', fams.length > 0 && fams.every((f) => ['Pretendard Variable', 'IBM Plex Mono'].includes(f)) && fams.includes('IBM Plex Mono'), fams.join(','));
+    // (INNA-653) 화면 글자는 파생본 Doram Sans(Pretendard 1.3.9 서브셋)와 IBM Plex Mono만. 공식 Pretendard는 범위 밖 글자가 있을 때만 받는다
+    check('로드된 글꼴은 Doram Sans·IBM Plex Mono만(공식 Pretendard 조각은 받지 않음)', fams.includes('Doram Sans') && fams.includes('IBM Plex Mono') && fams.every((f) => ['Doram Sans', 'IBM Plex Mono'].includes(f)), fams.join(','));
     const woff = requests.filter((r) => r.url.endsWith('.woff2')).map((r) => new URL(r.url).pathname);
-    check('글꼴 파일은 /company-01/fonts/ 아래 공식 파일', woff.length > 0 && woff.every((p) => p.startsWith('/company-01/fonts/pretendard/') || p.startsWith('/company-01/fonts/plex-mono/')), `${woff.length}개`);
+    check('글꼴 파일은 /company-01/fonts/ 아래 doram-sans 1개 + plex-mono', woff.filter((p) => p === '/company-01/fonts/doram-sans/DoramSans-subset.woff2').length === 1 && woff.every((p) => p.startsWith('/company-01/fonts/doram-sans/') || p.startsWith('/company-01/fonts/plex-mono/')), woff.join(','));
     const logo = await page.$eval('.site-header .logo img', (i) => ({ ok: i.complete && i.naturalWidth > 0, h: i.getBoundingClientRect().height }));
     check('로고(윤곽선 SVG) 표시', logo.ok && logo.h >= 30, JSON.stringify(logo));
     await context.close();
@@ -305,15 +311,61 @@ try {
     await page.waitForTimeout(50);
     const p4 = await sub(1);
     check('1280 포인터: 벗어났다가 다시 올리면 정상으로 열림, aria-expanded 일치', !p3.shown && same(p3) && p4.shown && same(p4), JSON.stringify({ p3, p4 }));
-    // 클릭: 보이는 상태에서 누르면 닫힘(포인터가 위에 있어도), 다시 누르면 열림
-    await page.mouse.down(); await page.mouse.up();
-    await page.waitForTimeout(50);
-    const c1 = await sub(1);
-    await page.mouse.down(); await page.mouse.up();
-    await page.waitForTimeout(50);
-    const c2 = await sub(1);
-    check('1280 클릭: 열린 하위 메뉴 버튼을 누르면 닫히고 다시 누르면 열림, 매번 aria-expanded 일치', !c1.shown && same(c1) && c2.shown && same(c2), JSON.stringify({ c1, c2 }));
+    // 클릭(INNA-653 R-1): hover로 보이는 것은 아직 '열기 전'. 첫 클릭은 열린 채 유지(명시적 열림), 두 번째는 포인터가 위에 있어도 닫힘, 세 번째 다시 열림
+    const clicks = [];
+    for (let n = 0; n < 3; n++) { await page.mouse.down(); await page.mouse.up(); clicks.push(await sub(1)); }
+    check('1280 클릭: hover 중 첫 클릭 → 열림 유지, 두 번째 → 닫힘(포인터가 위에 있어도), 세 번째 → 열림, 매번 aria-expanded 일치(바로 확인)',
+      clicks[0].shown && !clicks[1].shown && clicks[2].shown && clicks.every(same), JSON.stringify(clicks));
     await context.close();
+  }
+
+  // ---------- 6-3. (INNA-653 R-1) 1024 이상 새 페이지의 첫 클릭·첫 터치 탭·Enter/Space로 하위 메뉴가 열림 ----------
+  // 원 결함: 첫 클릭·탭이 hover/초점으로 이미 보이던 메뉴를 '닫기'로 처리. 포인터는 메뉴 밖에서 시작하고 hover로 바꿔 열지 않는다
+  {
+    const state = (page) => page.evaluate(() => [...document.querySelectorAll('.gnav [data-submenu-toggle]')].map((b) => {
+      const sub = b.parentElement.querySelector('.submenu');
+      const vis = [...sub.querySelectorAll('a')].filter((a) => { const r = a.getBoundingClientRect(); const hit = r.width ? document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) : null; return hit === a || a.contains(hit); }).length;
+      return { shown: getComputedStyle(sub).display !== 'none', aria: b.getAttribute('aria-expanded'), vis };
+    }));
+    const is = (s, want) => s.every((g, i) => g.aria === String(g.shown) && g.shown === want[i] && (!want[i] || g.vis === [2, 4][i]));
+    for (const w of [1024, 1280]) {
+      for (const touch of [false, true]) {
+        const how = touch ? '터치 탭' : '마우스 클릭';
+        const rows = [];
+        for (const i of [0, 1]) {
+          const { context, page } = await open('', { viewport: { width: w, height: 800 }, hasTouch: touch, reducedMotion: 'reduce' });
+          if (!touch) await page.mouse.move(w - 10, 790);
+          const b = await page.locator('.gnav [data-submenu-toggle]').nth(i).boundingBox();
+          const press = (x, y) => (touch ? page.touchscreen.tap(x, y) : page.mouse.click(x, y));
+          const want = (v) => (i === 0 ? [v, false] : [false, v]);
+          await press(b.x + b.width / 2, b.y + b.height / 2); const s1 = await state(page);
+          await press(b.x + b.width / 2, b.y + b.height / 2); const s2 = await state(page);
+          await press(b.x + b.width / 2, b.y + b.height / 2); const s3 = await state(page);
+          await press(w / 2, 700); const s4 = await state(page);
+          rows.push({ i, ok: is(s1, want(true)) && is(s2, want(false)) && is(s3, want(true)) && is(s4, [false, false]), s1, s2, s3, s4 });
+          await context.close();
+        }
+        check(`${w} ${how}: 새 페이지 첫 누름 → 열림·하위 링크 보임, 두 번째 → 닫힘, 세 번째 → 열림, 메뉴 밖 누르면 닫힘(두 그룹, 매번 aria-expanded 일치)`, rows.every((r) => r.ok), JSON.stringify(rows.filter((r) => !r.ok)));
+      }
+      const { context, page } = await open('', { viewport: { width: w, height: 800 }, reducedMotion: 'reduce' });
+      await page.focus('.logo'); await page.keyboard.press('Tab');
+      const k = [await state(page)];
+      for (const key of ['Enter', 'Enter', ' ', ' ', 'Enter']) { await page.keyboard.press(key); k.push(await state(page)); }
+      await page.keyboard.press('Escape'); k.push(await state(page));
+      await page.keyboard.press('Enter'); k.push(await state(page));
+      const kw = [[1, 0], [1, 0], [0, 0], [1, 0], [0, 0], [1, 0], [0, 0], [1, 0]].map((a) => a.map(Boolean));
+      check(`${w} 키보드: 초점 → Enter 열림 → Enter 닫힘 → Space 열림 → Space 닫힘 → Enter 열림 → Esc 닫힘 → Enter 다시 열림(매번 aria-expanded 일치)`, k.every((s, n) => is(s, kw[n])), JSON.stringify(k));
+      await context.close();
+    }
+    for (const w of [1024, 1280]) {
+      // 두 그룹 전환(새 페이지): 회사 소개 열기 → 가공 서비스 누르면 그쪽만 열림
+      const { context, page } = await open('', { viewport: { width: w, height: 800 }, reducedMotion: 'reduce' });
+      await page.mouse.move(w - 10, 790);
+      await page.locator('.gnav [data-submenu-toggle]').nth(0).click(); const g1 = await state(page);
+      await page.locator('.gnav [data-submenu-toggle]').nth(1).click(); const g2 = await state(page);
+      check(`${w} 두 그룹 전환: 회사 소개 → 가공 서비스를 누르면 가공 서비스만 열림`, is(g1, [true, false]) && is(g2, [false, true]), JSON.stringify({ g1, g2 }));
+      await context.close();
+    }
   }
 
   // ---------- 7. 샘플 안내창(전화·메일) ----------
@@ -432,7 +484,9 @@ try {
     check('[필수] 동의 해제 → 차단·초점, 이름을 비우면 이름 동의 오류 없음', rq.box && rq.focus === 'c-required' && !rq.nameBox, JSON.stringify(rq));
     const max = await page.$$eval('#quoteForm input:not([type=checkbox]), #quoteForm textarea', (a) => a.map((x) => x.maxLength));
     check('모든 입력 칸에 글자 수 상한(maxlength)', max.every((m) => m > 0), max.join(','));
-    check('무효 제출 동안 네트워크 요청 0건·주소 그대로', requests.length === before && page.url() === `${BASE}quote/`);
+    // 입력한 글자용 글꼴(대체 경로 CSS·조각 woff2) 정적 GET만 허용(INNA-653). 그 밖의 요청·쿼리·본문은 0건
+    const extra = requests.slice(before).filter((r) => !(r.method === 'GET' && !r.post && !new URL(r.url).search && /^\/company-01\/fonts\/pretendard\/.+\.(woff2|css)$/.test(new URL(r.url).pathname)));
+    check('무효 제출 동안 글꼴 파일 외 네트워크 요청 0건·주소 그대로', extra.length === 0 && page.url() === `${BASE}quote/`, extra.map((r) => `${r.method} ${r.url}`).join(','));
     check('콘솔에 입력값 없음', !consoleMsgs.some((m) => Object.values(T).some((v) => m.includes(v)) || m.includes('12345')));
     await context.close();
   }
@@ -475,7 +529,7 @@ try {
     const s8 = await sum();
     const kept = await page.evaluate(() => ({ contact: document.getElementById('f-contact').value.length, item: document.getElementById('f-item').value.length, req: document.getElementById('c-required').checked, result: document.getElementById('formResult').classList.contains('is-visible') }));
     check('견적 재제출: 1개·회사명으로 초점, 나머지 입력값·필수 동의는 지우지 않고 보존, 완료 안내 없음', s8.vis && s8.n === 1 && s8.focus === 'f-company' && kept.contact > 0 && kept.item > 0 && kept.req && !kept.result, JSON.stringify({ s8, kept }));
-    check('견적 요약 검사 동안 네트워크 요청 0건·주소 그대로', requests.slice(before).filter((r) => !/\.woff2$/.test(new URL(r.url).pathname)).length === 0 && page.url() === `${BASE}quote/`);
+    check('견적 요약 검사 동안 네트워크 요청 0건·주소 그대로', requests.slice(before).filter((r) => !/^\/company-01\/fonts\/.+\.(woff2|css)$/.test(new URL(r.url).pathname)).length === 0 && page.url() === `${BASE}quote/`);
     await context.close();
   }
 
@@ -532,8 +586,8 @@ try {
     check(`유효(${tagC}) Enter 제출 → "실제로 전송되지 않습니다" 안내, 안내로 초점`, done.result && done.text.includes('실제로 전송되지 않습니다') && done.text.includes('접수 알림') && done.focus === 'formResult' && done.errs === 0, JSON.stringify({ ...done, text: done.text.trim().slice(0, 40) }));
     check(`유효(${tagC}): 입력값·동의 체크 즉시 지움`, done.values === '' && !done.checks);
     const html = await page.content();
-    // 안내 문구를 그리려고 글꼴 조각(woff2)을 더 받는 GET은 정적 파일 요청이라 허용. 그 밖의 요청·쿼리·본문은 0건이어야 한다.
-    const sent = requests.slice(before).filter((r) => !(r.method === 'GET' && !r.post && !new URL(r.url).search && /^\/company-01\/fonts\/.+\.woff2$/.test(new URL(r.url).pathname)));
+    // 입력한 글자를 그리려고 글꼴 조각(woff2)·대체 경로 CSS(입력 칸 초점 때 연결, INNA-653)를 받는 GET은 정적 파일 요청이라 허용. 그 밖의 요청·쿼리·본문은 0건이어야 한다.
+    const sent = requests.slice(before).filter((r) => !(r.method === 'GET' && !r.post && !new URL(r.url).search && /^\/company-01\/fonts\/.+\.(woff2|css)$/.test(new URL(r.url).pathname)));
     check(`유효(${tagC}): 글꼴 파일 외 네트워크 요청 0건, 주소에 쿼리 없음`, sent.length === 0 && page.url() === `${BASE}quote/`, `글꼴 ${requests.length - before - sent.length}건 / 그 외 ${sent.map((r) => `${r.method} ${r.url}`).join(',')}`);
     check(`유효(${tagC}): 저장소·쿠키 비어 있음, 콘솔·HTML에 입력값 없음`, (await storageEmpty(page)) && !consoleMsgs.some((m) => Object.values(T).some((v) => m.includes(v))) && !Object.values(T).some((v) => html.includes(v)));
     if (contact === T.phone) {

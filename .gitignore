@@ -8,3 +8,4 @@ sites/*/public/fonts/pretendard/
 .env.*
 !.env.example
 .DS_Store
+.venv-font/

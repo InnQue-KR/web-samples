@@ -26,7 +26,7 @@
   --c-focus:#1B5FD6;
 
   /* 글꼴 */
-  --f-sans:"Pretendard Variable","Pretendard","Noto Sans KR","Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-sans:"Doram Sans","Pretendard Variable","Pretendard","Noto Sans KR","Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --f-mono:"IBM Plex Mono","D2Coding","Noto Sans Mono CJK KR",ui-monospace,monospace;
 
   /* 글자 크기 (데스크톱 / 아래 media에서 모바일 값으로 덮어씀) */

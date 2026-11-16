@@ -6,9 +6,12 @@
 //  - landing-01: data-track 정확히 3종, 폼 잠금(fieldset disabled)과 개인정보 칸 name 없음
 //  - company-01: 확정 URL 10개+404, URL별 title/description/OG, 견적 폼 잠금·name 없음·입력 5개 이하·첨부 없음·동의 2개, data-track 미연결
 //  - Pretendard dynamic-subset 범위 밖 글자(글꼴 누락) 목록, 페이지별 예상 전송량
+//  - company-01 파생 글꼴 Doram Sans: manifest 해시·크기·unicode-range 일치, 라이선스 동봉, 사이트 HTML·JS·CSS 글자가 모두 범위 안(누락 시 재생성 안내)
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { SAMPLE_ORIGIN } from '../packages/sample-kit/origin.mjs';
+import { createHash } from 'node:crypto';
+import { collectChars } from '../sites/company-01/scripts/font-chars.mjs';
 
 const root = new URL('..', import.meta.url).pathname;
 const dist = join(root, 'dist');
@@ -150,12 +153,43 @@ const textOf = (html) => {
   const body = html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ');
   return (body + ' ' + attrs.join(' ')).replace(/&[a-z]+;|&#\d+;/g, ' ');
 };
+// 3-1) 파생 글꼴(company-01 Doram Sans, sites/company-01/scripts/make-font-subset.py). 없으면 null
+function checkDerivedFont(id, r) {
+  const dir = join(dist, id, 'fonts/doram-sans');
+  if (!existsSync(join(dir, 'manifest.json'))) return null;
+  const m = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8'));
+  const woff = join(dir, m.file);
+  const sha = createHash('sha256').update(readFileSync(woff)).digest('hex');
+  if (sha !== m.sha256 || statSync(woff).size !== m.bytes) fail(`${id}: ${m.file}가 manifest와 다름(손으로 바꾸지 말고 make-font-subset.py로 재생성)`);
+  const css = readFileSync(join(dir, 'doram-sans.css'), 'utf8');
+  const face = parseRanges(css);
+  if (face.length !== 1 || face[0].file !== m.file || !css.includes(`unicode-range:${m.unicodeRange};`) || !css.includes(`font-family:"${m.family}"`)) fail(`${id}: doram-sans.css의 파일·이름·unicode-range가 manifest와 다름`);
+  const lic = join(dir, 'LICENSE.txt');
+  if (!existsSync(lic) || !readFileSync(lic, 'utf8').includes('Reserved Font Name Pretendard') || !/SIL OPEN FONT LICENSE Version 1\.1/.test(readFileSync(lic, 'utf8'))) fail(`${id}: 파생 글꼴 폴더에 Pretendard OFL 1.1 LICENSE.txt 없음`);
+  if (!existsSync(join(root, 'sites', id, 'public/fonts/doram-sans/FONTLOG.txt'))) fail(`${id}: 파생 글꼴 수정 기록 FONTLOG.txt 없음`);
+  const covered = (cp) => face[0]?.ranges.some(([a, b]) => cp >= a && cp <= b);
+  const { chars, sources } = collectChars(join(dist, id));
+  const missing = chars.filter((c) => !covered(c.codePointAt(0)) && c !== ' ');
+  if (missing.length) fail(`${id}: 파생 글꼴 Doram Sans 범위 밖 글자 ${missing.length}개: ${missing.map((c) => `${c} U+${c.codePointAt(0).toString(16).toUpperCase()}(${sources[c]})`).join(', ')} → 운영 안내 5절대로 make-font-subset.py 재생성`);
+  // 사이트 CSS의 본문 글꼴 순서: 파생본 → 공식 Pretendard(범위 밖 글자) → 시스템
+  const siteCss = files.filter((f) => f.endsWith('.css') && f.startsWith(join(dist, id, '_astro'))).map((f) => readFileSync(f, 'utf8')).join('');
+  if (!/--f-sans:\s*"Doram Sans",\s*"Pretendard Variable"/.test(siteCss)) fail(`${id}: --f-sans가 "Doram Sans","Pretendard Variable" 순서가 아님`);
+  for (const p of files.filter((f) => f.endsWith('.html') && sampleOf(f) === id)) {
+    const html = readFileSync(p, 'utf8');
+    if (!html.includes(`href="/${id}/fonts/doram-sans/doram-sans.css"`)) fail(`${rel(p)}: doram-sans.css 연결 없음`);
+    if (!/<noscript><link rel="stylesheet" href="[^"]*pretendardvariable-dynamic-subset\.css"/.test(html)) fail(`${rel(p)}: JS 꺼짐용 공식 Pretendard noscript 연결 없음`);
+    if (!html.includes(`fallbackCss = "/${id}/fonts/pretendard/pretendardvariable-dynamic-subset.css"`) || !html.includes("addEventListener('focusin'")) fail(`${rel(p)}: 입력 칸 초점 때 공식 Pretendard(범위 밖 글자용)를 붙이는 인라인 스크립트 없음`);
+  }
+  r.derivedFont = { file: m.file, bytes: m.bytes, codepoints: m.codepoints, siteChars: chars.length, missing: missing.length };
+  return m;
+}
 for (const id of readdirSync(join(root, 'sites'))) {
   const fontCss = join(dist, id, 'fonts/pretendard/pretendardvariable-dynamic-subset.css');
   if (!existsSync(fontCss)) continue;
   const faces = parseRanges(readFileSync(fontCss, 'utf8'));
   const pages = files.filter((f) => f.endsWith('.html') && sampleOf(f) === id);
   const r = (report[id] = { fontFaces: faces.length, fontFilesOnDisk: 0, fontBytesOnDisk: 0, pages: {} });
+  const derived = checkDerivedFont(id, r);
   for (const f of walk(join(dist, id, 'fonts/pretendard/woff2-dynamic-subset'))) { r.fontFilesOnDisk++; r.fontBytesOnDisk += statSync(f).size; }
   for (const p of pages) {
     const html = readFileSync(p, 'utf8');
@@ -168,10 +202,11 @@ for (const id of readdirSync(join(root, 'sites'))) {
       if (face) used.add(face.file); else missing.push(`${c} U+${cp.toString(16).toUpperCase()}`);
     }
     if (missing.length) fail(`${rel(p)}: Pretendard 범위 밖 글자 ${missing.join(', ')}`);
-    const fontBytes = [...used].reduce((s, file) => s + statSync(resolve(dirname(fontCss), file)).size, 0);
+    // 파생 글꼴이 있으면 화면 글자는 그 파일 하나로 받는다(공식 조각은 범위 밖 글자용, 아래 derived 검사에서 범위 확인). 링크된 woff2(preload)는 assetBytes에 들어감
+    const fontBytes = derived ? 0 : [...used].reduce((s, file) => s + statSync(resolve(dirname(fontCss), file)).size, 0);
     const assets = [...html.matchAll(/\s(?:href|src)="(\/[^"]+\.(?:css|js|svg|png|woff2))"/g)].map((m) => m[1]);
     const assetBytes = [...new Set(assets)].reduce((s, u) => s + (existsSync(resolveUrl(p, u)) ? statSync(resolveUrl(p, u)).size : 0), 0);
-    const total = statSync(p).size + assetBytes + fontBytes + statSync(fontCss).size;
+    const total = statSync(p).size + assetBytes + fontBytes + (assets.some((u) => u.endsWith('pretendardvariable-dynamic-subset.css')) ? 0 : statSync(fontCss).size);
     r.pages[rel(p)] = { distinctChars: chars.length, fontSubsetsUsed: used.size, fontBytes, htmlBytes: statSync(p).size, linkedAssetBytes: assetBytes, estimatedTotalBytes: total };
     if (total > 1.5 * 1024 * 1024) fail(`${rel(p)}: 예상 전송량 ${total}B > 1.5MB`);
   }
