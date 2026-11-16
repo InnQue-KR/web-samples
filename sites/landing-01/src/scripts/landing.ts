@@ -21,16 +21,27 @@ if (document.documentElement.classList.contains('motion') && 'IntersectionObserv
 
 /* 2) 상담 신청 구역 위쪽이 화면에 들어온 뒤로는(구역 안·그 아래 바닥글 포함) 하단 고정 버튼을 접는다.
  *    구역 위쪽이 다시 화면 아래로 내려가면 보인다. 보이는 비율이 아니라 위치로 판단해서 구역이 아무리 길어도 맞다.
- *    접힌 동안 키보드 초점도 받지 않게 inert. 창 크기가 바뀌어도 관찰자가 다시 알려 준다. */
+ *    접힌 동안 키보드 초점도 받지 않게 inert.
+ *    관찰자는 구역이 화면 밖→밖으로 한 번에 건너뛰면(바닥글 로고·FAQ 링크 등) 알려 주지 않으므로,
+ *    스크롤·창 크기·페이지 복귀 때마다 현재 위치를 다시 재되 한 프레임에 한 번만 잰다. */
 const sticky = document.getElementById('sticky-cta');
 const apply = document.getElementById('apply');
-if (sticky && apply && 'IntersectionObserver' in window) {
-  new IntersectionObserver(([e]) => {
-    if (!e) return;
-    const hide = e.isIntersecting || e.boundingClientRect.top < 0;
+if (sticky && apply) {
+  let queued = false;
+  const sync = () => {
+    queued = false;
+    const hide = apply.getBoundingClientRect().top < window.innerHeight;
     sticky.classList.toggle('is-hidden', hide);
     sticky.inert = hide;
-  }).observe(apply);
+  };
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(sync); } };
+  const opts = { passive: true };
+  addEventListener('scroll', queue, opts);
+  addEventListener('resize', queue, opts);
+  addEventListener('pageshow', queue);
+  // 스크롤 없이 위쪽 내용 높이만 바뀌어 구역이 움직이는 경우는 관찰자가 맡는다.
+  if ('IntersectionObserver' in window) new IntersectionObserver(queue).observe(apply);
+  sync();
 }
 
 /* 3) 전화·개인정보처리방침: 연결하지 않고 안내만 */

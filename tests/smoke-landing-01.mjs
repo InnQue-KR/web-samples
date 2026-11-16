@@ -153,6 +153,29 @@ try {
     await context.close();
   }
 
+  // ---------- 4-1. 끝에서 상담 구역을 건너뛰어 한 번에 위로 (R2-01: 320×568에서 구역이 화면 밖→밖으로 이동) ----------
+  {
+    const { context, page } = await open({ viewport: { width: 320, height: 568 }, reducedMotion: 'reduce' });
+    const st = () => page.$eval('#sticky-cta', (e) => ({ hidden: e.classList.contains('is-hidden'), inert: e.inert }));
+    const toEnd = async () => { await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await page.waitForTimeout(300); };
+    await toEnd();
+    let s = await st();
+    check('320×568 맨 위→끝 한 번에 이동해도 접힘·inert', s.hidden && s.inert, JSON.stringify(s));
+    // 상담 구역을 거쳐 끝까지 내려간 뒤(관찰자가 접힘을 알린 상태) 구역을 건너 위로
+    await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(300);
+    await page.evaluate(() => document.getElementById('apply').scrollIntoView()); await page.waitForTimeout(300);
+    await toEnd();
+    await page.evaluate(() => document.getElementById('faq').scrollIntoView()); await page.waitForTimeout(300);
+    s = await st();
+    check('320×568 끝→FAQ 한 번에 이동하면 다시 보임·inert 해제', !s.hidden && !s.inert, JSON.stringify(s));
+    await page.evaluate(() => document.getElementById('apply').scrollIntoView()); await page.waitForTimeout(300);
+    await toEnd();
+    await page.click('.site-footer__logo'); await page.waitForTimeout(300);
+    s = await st();
+    check('320×568 끝→바닥글 로고(맨 위)로 이동하면 다시 보임·inert 해제', !s.hidden && !s.inert, JSON.stringify(s));
+    await context.close();
+  }
+
   // ---------- 5. FAQ·동의 내용 열기 ----------
   {
     const { context, page } = await open({ viewport: { width: 1280, height: 900 } });
