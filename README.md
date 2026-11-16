@@ -15,7 +15,7 @@ InnQue 포트폴리오용 **가상** 샘플 사이트 모음입니다. 모든 �
 | npm | 11.19.1 | `packageManager` |
 | Astro | 7.4.12 | 2026-11-15 npm 최신 안정판, exact 고정 |
 | TypeScript / @astrojs/check | 6.0.3 / 0.9.12 | @astrojs/check가 TS 7을 아직 지원하지 않아 6.x |
-| Pretendard | 1.3.9 | 공식 npm 패키지의 가변 dynamic-subset을 변경 없이 복사. company-01은 화면 글자만 담은 파생본 Doram Sans(아래)를 먼저 쓰고 공식 파일은 범위 밖 글자용 |
+| Pretendard | 1.3.9 | 공식 npm 패키지의 가변 dynamic-subset을 변경 없이 복사. company-01은 화면 글자만 담은 파생본 Doram Sans(아래)를 먼저 쓰고 공식 파일은 폼 입력의 범위 밖 글자용(입력 칸 초점 때·JS 꺼짐 때만 연결. 정적 콘텐츠 글자는 파생본 재생성) |
 | fontTools / brotli (company-01 글꼴 재생성 전용) | 4.68.0 / 1.2.1 | `sites/company-01/scripts/font-requirements.txt`(PyPI 해시 고정). 빌드·검사에는 필요 없음 |
 | IBM Plex Mono (company-01) | 1.1.0 | 공식 Latin1 woff2 2개를 변경 없이 저장소에 둠(npm 패키지는 설치 때 원격 측정을 실행해 의존성으로 넣지 않음) |
 | Playwright(검사용) | 1.65.1 | Chromium headless shell |
