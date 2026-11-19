@@ -38,3 +38,5 @@ Change log
             per page) with one file for the characters on the site. Characters
             outside this file (new content, user input) fall back to the
             unmodified official Pretendard dynamic-subset files.
+2026-11-19  Regenerated with the same script after a footer wording change
+            added one character (U+CF54). 501 code points (InnQue task INNA-819).

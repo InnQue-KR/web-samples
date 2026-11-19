@@ -48,7 +48,7 @@
 
 ## 5. 글꼴·라이선스
 
-- **Doram Sans(파생 글꼴, INNA-653)**: `public/fonts/doram-sans/`. Pretendard 1.3.9 가변 글꼴에서 이 사이트에 쓰인 글자(사이트 HTML·JS·CSS 문구 + 출력 가능한 ASCII 전부 + 고정 기호, 지금 500자)만 남긴 파일 하나(약 112KB). 윤곽선·굵기 축(45–930)·간격·kern·OpenType 기능은 원본 그대로이고, SIL OFL 1.1의 예약 글꼴 이름(Pretendard) 때문에 이름표만 `Doram Sans`로 바꿨습니다. 저작권·라이선스·상표 문구는 그대로이며 `LICENSE.txt`(원본과 같은 OFL 전문), `FONTLOG.txt`(수정 기록), `manifest.json`(원본 해시·도구 버전·명령·글자 범위·결과 해시)을 함께 둡니다.
+- **Doram Sans(파생 글꼴, INNA-653)**: `public/fonts/doram-sans/`. Pretendard 1.3.9 가변 글꼴에서 이 사이트에 쓰인 글자(사이트 HTML·JS·CSS 문구 + 출력 가능한 ASCII 전부 + 고정 기호, 지금 501자)만 남긴 파일 하나(약 112KB). 윤곽선·굵기 축(45–930)·간격·kern·OpenType 기능은 원본 그대로이고, SIL OFL 1.1의 예약 글꼴 이름(Pretendard) 때문에 이름표만 `Doram Sans`로 바꿨습니다. 저작권·라이선스·상표 문구는 그대로이며 `LICENSE.txt`(원본과 같은 OFL 전문), `FONTLOG.txt`(수정 기록), `manifest.json`(원본 해시·도구 버전·명령·글자 범위·결과 해시)을 함께 둡니다.
   - 본문 글꼴 순서: `"Doram Sans"` → `"Pretendard Variable"`(공식 dynamic-subset) → 시스템 글꼴. Doram Sans의 `unicode-range`가 실제 글자 목록과 같아서, 화면 글자는 파생본 한 파일만 받습니다. 공식 CSS(약 55KB)는 첫 로드에 붙이지 않으므로, 파생본 범위 밖 글자는 경로에 따라 다르게 그려집니다.
     - **방문자가 폼에 치는 글자(임의 입력)**: `BaseLayout.astro`의 인라인 스크립트가 `input·textarea·select·[contenteditable]`에 처음 초점이 갈 때(`focusin`) 공식 CSS를 붙이고, 그 뒤 범위 밖 글자만 공식 조각을 받습니다. 붙기 전(초점 직후 아주 짧은 순간)에는 시스템 글꼴로 보일 수 있습니다. 이 경로는 운영자가 미리 알 수 없는 글자를 위한 것입니다.
     - **운영자가 넣는 정적 콘텐츠(새 공지·본문·메뉴·안내 문구 등)**: 공식 Pretendard로 대체되지 않습니다. JS가 켜진 보통 방문에서는 입력 칸 초점 전까지 공식 CSS가 없으므로 범위 밖 글자를 시스템 글꼴로 그립니다(JS가 꺼진 방문만 `noscript`로 공식 CSS를 바로 붙여 공식 조각을 받음). 그래서 이런 글자는 반드시 아래 "다시 만들기"로 파생본에 넣습니다. `npm run check`가 dist의 HTML·JS·CSS 글자를 모두 검사해 하나라도 빠지면 실패하며, 실패한 상태로는 배포하지 않습니다.

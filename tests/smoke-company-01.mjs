@@ -417,7 +417,8 @@ try {
   {
     const { context, page } = await open('news/');
     const rows = await page.$$eval('.board tbody tr', (trs) => trs.map((tr) => ({ no: tr.querySelector('.c-no')?.textContent, href: tr.querySelector('a')?.getAttribute('href'), t: tr.querySelector('a')?.textContent, d: tr.querySelector('.c-date')?.textContent })));
-    check('소식 목록 3건(번호 3·2·1, 최신순)', rows.length === 3 && rows.map((r) => r.no).join() === '3,2,1' && rows[0].d === '2027-01-25' && rows[2].d === '2026-09-02', JSON.stringify(rows.map((r) => `${r.no} ${r.d} ${r.t}`)));
+    check('소식 목록 3건(번호 3·2·1, 최신순)', rows.length === 3 && rows.map((r) => r.no).join() === '3,2,1' && rows[0].d === '2026-10-14' && rows[2].d === '2026-02-09', JSON.stringify(rows.map((r) => `${r.no} ${r.d} ${r.t}`)));
+    check('앞날짜(오늘 이후) 소식 없음', rows.every((r) => r.d <= new Date().toISOString().slice(0, 10)), rows.map((r) => r.d).join());
     check('목록 링크가 안내창이 아니라 상세 주소', rows.every((r) => r.href?.startsWith('/company-01/news/') && r.href.length > '/company-01/news/'.length));
     const detail = [];
     for (const r of rows) {
@@ -433,13 +434,13 @@ try {
       detail.at(-1).expect = r.t;
     }
     check('상세 3건 모두 200, NewsDetail 틀, 제목 일치, 본문 있음', detail.every((d) => d.status === 200 && d.frame === 'NewsDetail' && d.h1 === d.expect && d.body >= 3), JSON.stringify(detail.map((d) => [d.status, d.h1, d.body])));
-    check('가장 최근 글: 다음 글 없음 / 이전 글 = 5축', detail[0].next.includes('다음 글이 없습니다') && detail[0].prev.includes('5축 머시닝센터'), `${detail[0].next} | ${detail[0].prev}`);
-    check('가운데 글: 다음 = 설 연휴 / 이전 = 품질경영', detail[1].next === '설 연휴 휴무 안내' && detail[1].prev.includes('품질경영시스템'), `${detail[1].next} | ${detail[1].prev}`);
-    check('가장 오래된 글: 이전 글 없음', detail[2].prev.includes('이전 글이 없습니다') && detail[2].next.includes('5축'), `${detail[2].next} | ${detail[2].prev}`);
-    await page.goto(`${BASE}news/5-axis-machining-center/`);
+    check('가장 최근 글: 다음 글 없음 / 이전 글 = 품질경영', detail[0].next.includes('다음 글이 없습니다') && detail[0].prev.includes('품질경영시스템'), `${detail[0].next} | ${detail[0].prev}`);
+    check('가운데 글: 다음 = 5축 / 이전 = 설 연휴', detail[1].next.includes('5축 머시닝센터') && detail[1].prev.includes('설 연휴 휴무 안내'), `${detail[1].next} | ${detail[1].prev}`);
+    check('가장 오래된 글: 이전 글 없음', detail[2].prev.includes('이전 글이 없습니다') && detail[2].next.includes('품질경영시스템'), `${detail[2].next} | ${detail[2].prev}`);
+    await page.goto(`${BASE}news/seollal-holiday/`);
     await page.click('.article__nav a:first-child');
     await page.waitForLoadState('networkidle');
-    check('상세 [다음 글] 누르면 해당 상세로 이동', page.url() === `${BASE}news/seollal-holiday/`, page.url());
+    check('상세 [다음 글] 누르면 해당 상세로 이동', page.url() === `${BASE}news/quality-certification-renewal/`, page.url());
     await page.goto(BASE, { waitUntil: 'networkidle' });
     const home = await page.$$eval('.news-simple a', (as) => as.map((a) => a.getAttribute('href')));
     check('홈 최근 소식 3건이 상세 주소로 연결', home.length === 3 && home.every((h, i) => h === rows[i].href), home.join(', '));
